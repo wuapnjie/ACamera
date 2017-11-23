@@ -1,5 +1,9 @@
 package com.xiaopo.flying.acamera.command;
 
+import android.util.Log;
+
+import com.xiaopo.flying.acamera.base.SafeCloseable;
+
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -7,7 +11,8 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * @author wupanjie
  */
-public class CameraCommandExecutor implements Observer<CameraCommand> {
+public class CameraCommandExecutor implements Observer<CameraCommand>, SafeCloseable {
+  private static final String TAG = "CameraCommandExecutor";
 
   private Disposable disposable;
   private final Object lock = new Object();
@@ -30,17 +35,21 @@ public class CameraCommandExecutor implements Observer<CameraCommand> {
 
   @Override
   public void onError(Throwable e) {
-
+    Log.e(TAG, "onError: ", e);
   }
 
   @Override
   public void onComplete() {
+    close();
+  }
+
+  @Override
+  public void close() {
     synchronized (lock) {
       closed = true;
       if (!disposable.isDisposed()) {
         disposable.dispose();
       }
     }
-
   }
 }

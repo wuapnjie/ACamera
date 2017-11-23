@@ -1,20 +1,12 @@
 package com.xiaopo.flying.acamera.preview;
 
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraDevice;
-import android.os.Handler;
 import android.view.Surface;
 
-import com.xiaopo.flying.acamera.ACameraCharacteristics;
-import com.xiaopo.flying.acamera.base.Consumer;
-import com.xiaopo.flying.acamera.base.Supplier;
-import com.xiaopo.flying.acamera.command.CameraCommand;
-import com.xiaopo.flying.acamera.command.CameraCommandBuilder;
+import com.xiaopo.flying.acamera.base.SafeCloseable;
 import com.xiaopo.flying.acamera.command.CameraCommandCenter;
-import com.xiaopo.flying.acamera.command.CameraCommandExecutor;
 import com.xiaopo.flying.acamera.command.CameraCommandFactory;
 import com.xiaopo.flying.acamera.command.CameraCommandType;
-import com.xiaopo.flying.acamera.command.PreviewCommand;
 import com.xiaopo.flying.acamera.util.ApiHelper;
 
 import java.util.ArrayList;
@@ -29,26 +21,20 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * @author wupanjie
  */
-public class PreviewStarter {
+public class PreviewStarter implements SafeCloseable{
 
   private final List<Surface> outputSurfaces;
   private final CaptureSessionCreator captureSessionCreator;
-  private final CameraDevice cameraDevice;
-  private final ACameraCharacteristics cameraCharacteristics;
-  private final Handler cameraHandler;
+  private final CameraCommandFactory commandFactory;
+  private CameraCaptureSession currentPreviewSession;
 
   public PreviewStarter(List<Surface> outputSurfaces,
                         CaptureSessionCreator captureSessionCreator,
-                        CameraDevice cameraDevice,
-                        ACameraCharacteristics cameraCharacteristics,
-                        Handler cameraHandler) {
+                        CameraCommandFactory commandFactory) {
     this.outputSurfaces = outputSurfaces;
     this.captureSessionCreator = captureSessionCreator;
-    this.cameraDevice = cameraDevice;
-    this.cameraCharacteristics = cameraCharacteristics;
-    this.cameraHandler = cameraHandler;
+    this.commandFactory = commandFactory;
   }
-
 
   public Completable startPreview(final Surface previewSurface) {
     // When we have the preview surface, start the capture session.
@@ -75,28 +61,9 @@ public class PreviewStarter {
               @Override
               public ObservableSource<?> apply(final CameraCaptureSession captureSession) throws Exception {
 
-                CameraCommandCenter commandCenter = CameraCommandCenter.getInstance();
-                CameraCommandExecutor commandExecutor = new CameraCommandExecutor();
-
-                commandCenter.registerExecutor(commandExecutor);
-
-                CameraCommandFactory commandFactory = CameraCommandFactory.factory(new Consumer<CameraCommandBuilder>() {
-                  @Override
-                  public void accept(CameraCommandBuilder cameraCommandBuilder) {
-                    cameraCommandBuilder.add(CameraCommandType.PREVIEW, new Supplier<CameraCommand>() {
-                      @Override
-                      public CameraCommand get() {
-                        return new PreviewCommand(previewSurface,
-                            cameraDevice,
-                            cameraCharacteristics,
-                            captureSession,
-                            cameraHandler);
-                      }
-                    });
-                  }
-                });
-
-                commandCenter.nextCommand(commandFactory.create(CameraCommandType.PREVIEW));
+                currentPreviewSession = captureSession;
+                CameraCommandCenter.getInstance()
+                    .nextCommand(commandFactory.create(CameraCommandType.PREVIEW));
 
                 return Observable.empty();
               }
@@ -104,4 +71,8 @@ public class PreviewStarter {
     );
   }
 
+  @Override
+  public void close() {
+    currentPreviewSession.close();
+  }
 }

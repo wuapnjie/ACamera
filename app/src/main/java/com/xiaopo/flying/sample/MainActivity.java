@@ -13,9 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.View;
+import android.widget.Button;
 
 import com.xiaopo.flying.acamera.ACamera;
-import com.xiaopo.flying.acamera.ARealCamera2Opener;
+import com.xiaopo.flying.acamera.ACameraOpener;
 import com.xiaopo.flying.acamera.model.CameraId;
 import com.xiaopo.flying.acamera.util.AndroidServices;
 import com.yanzhenjie.permission.AndPermission;
@@ -33,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   private CameraManager cameraManager;
   private TextureView textureView;
   private SurfaceTexture surfaceTexture;
+  private Button btnClose;
+
+  private ACamera camera;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +45,13 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     setContentView(R.layout.activity_main);
 
     textureView = findViewById(R.id.preview_content);
-
+    btnClose = findViewById(R.id.btn_close);
+    btnClose.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        closeCamera();
+      }
+    });
 
     AndPermission.with(this)
         .permission(Manifest.permission.CAMERA)
@@ -76,6 +87,12 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
 
   }
 
+  @Override
+  protected void onPause() {
+    super.onPause();
+    closeCamera();
+  }
+
   private String findFirstCameraIdFacing(int facing) {
     try {
       String[] cameraIds = cameraManager.getCameraIdList();
@@ -95,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
     this.surfaceTexture = surface;
     Matrix matrix = new Matrix();
-    matrix.setValues(new float[]{1,0,0,0,1,0,0,0,1});
+    matrix.setValues(new float[]{1, 0, 0, 0, 1, 0, 0, 0, 1});
     textureView.setTransform(matrix);
     openCamera();
   }
@@ -103,12 +120,14 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   private void openCamera() {
     CameraId cameraId = CameraId.from(findFirstCameraIdFacing(CameraCharacteristics.LENS_FACING_BACK));
 
-    new ARealCamera2Opener()
-        .open(cameraId, cameraHandler)
+    ACameraOpener
+        .with(cameraId, cameraHandler)
+        .open()
         .subscribe(new Consumer<ACamera>() {
           @Override
           public void accept(ACamera aCamera) throws Exception {
             Log.d(TAG, "accept: aCamera");
+            camera = aCamera;;
 
             surfaceTexture.setDefaultBufferSize(1280, 960);
 
@@ -130,5 +149,12 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   @Override
   public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
+  }
+
+  private void closeCamera() {
+    if (camera != null) {
+      camera.close();
+      camera = null;
+    }
   }
 }

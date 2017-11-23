@@ -2,6 +2,8 @@ package com.xiaopo.flying.acamera.base.optional;
 
 import android.support.annotation.Nullable;
 
+import com.xiaopo.flying.acamera.base.Consumer;
+
 import java.io.Serializable;
 import java.util.Set;
 
@@ -241,4 +243,10 @@ public abstract class Optional<T> implements Serializable {
 
 
   private static final long serialVersionUID = 0;
+
+  public void ifPresent(Consumer<? super T> consumer){
+    if (isPresent()){
+      consumer.accept(get());
+    }
+  }
 }

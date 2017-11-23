@@ -1,2 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xiaopo.flying.acamera" />
+    package="com.xiaopo.flying.acamera" >
+
+    <uses-permission android:name="android.permission.CAMERA" />
+</manifest>

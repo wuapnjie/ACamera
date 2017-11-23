@@ -9,6 +9,11 @@ import io.reactivex.Single;
 /**
  * @author wupanjie
  */
-public interface ACameraOpener {
-  Single<ACamera> open(CameraId cameraId, Handler cameraHandler);
+public abstract class ACameraOpener {
+
+  public static ACameraOpener with(CameraId cameraId, Handler cameraHandler) {
+    return new ARealCamera2Opener(cameraId, cameraHandler);
+  }
+
+  public abstract Single<ACamera> open();
 }

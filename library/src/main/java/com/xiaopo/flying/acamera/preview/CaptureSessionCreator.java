@@ -20,16 +20,13 @@ public class CaptureSessionCreator {
   private final CameraDevice cameraDevice;
   private final Handler cameraHandler;
 
-  /**
-   * @param cameraDevice
-   * @param cameraHandler The handler on which to process capture session
-   */
+
   public CaptureSessionCreator(CameraDevice cameraDevice,Handler cameraHandler) {
     this.cameraDevice = cameraDevice;
     this.cameraHandler = cameraHandler;
   }
 
-  public Observable<CameraCaptureSession> createCaptureSession(final List<Surface> surfaces) {
+  Observable<CameraCaptureSession> createCaptureSession(final List<Surface> surfaces) {
 
     return Observable.create(new ObservableOnSubscribe<CameraCaptureSession>() {
       @Override
@@ -38,20 +35,13 @@ public class CaptureSessionCreator {
           private boolean isEmitted = false;
 
           @Override
-          public void onActive(@NonNull CameraCaptureSession session) {
-
-          }
-
-          @Override
           public void onClosed(@NonNull CameraCaptureSession session) {
-            if (isEmitted) return;
             session.close();
             emitter.onComplete();
           }
 
           @Override
           public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-            if (isEmitted) return;
             session.close();
             emitter.onComplete();
           }
@@ -59,6 +49,7 @@ public class CaptureSessionCreator {
           @Override
           public void onConfigured(@NonNull CameraCaptureSession session) {
             if (isEmitted) return;
+            SessionManager.getInstance().emitSession(session);
             emitter.onNext(session);
             emitter.onComplete();
             isEmitted = true;

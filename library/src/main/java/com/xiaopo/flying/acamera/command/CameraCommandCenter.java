@@ -1,16 +1,16 @@
 package com.xiaopo.flying.acamera.command;
 
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * @author wupanjie
  */
 public class CameraCommandCenter {
-  private final BehaviorSubject<CameraCommand> commandSubject;
+  private final PublishSubject<CameraCommand> commandSubject;
   private static CameraCommandCenter instance;
 
   private CameraCommandCenter() {
-    commandSubject = BehaviorSubject.create();
+    commandSubject = PublishSubject.create();
   }
 
   public static CameraCommandCenter getInstance() {
@@ -35,6 +35,4 @@ public class CameraCommandCenter {
   public void registerExecutor(CameraCommandExecutor commandExecutor) {
     commandSubject.subscribe(commandExecutor);
   }
-
-
 }
