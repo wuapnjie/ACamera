@@ -1,18 +1,22 @@
 package com.xiaopo.flying.acamera.command;
 
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
 
-/**
- * A generic camera command which may take an arbitrary, indefinite amount of
- * time to execute. Camera commands typically interact with the camera device,
- * capture session, image reader, and other resources.
- * <p>
- * When shutting down, it is critical that commands gracefully exit when these
- * resources are no longer available.
- */
 public abstract class CameraCommand implements Command {
+
+  private long delay = 0L;
+  private TimeUnit unit = TimeUnit.SECONDS;
+
+  public Disposable start(Scheduler scheduler) {
+    Scheduler.Worker worker = scheduler.createWorker();
+    return worker.schedule(this, delay, unit);
+  }
 
   public Completable start() {
     return Completable.create(new CompletableOnSubscribe() {
@@ -27,6 +31,11 @@ public abstract class CameraCommand implements Command {
         e.onComplete();
       }
     });
+  }
+
+  void setDelay(long delay, TimeUnit unit) {
+    this.delay = delay;
+    this.unit = unit;
   }
 
 }

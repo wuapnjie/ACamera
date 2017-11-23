@@ -1,17 +1,11 @@
 package com.xiaopo.flying.acamera.request;
 
-import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.view.Surface;
 
-import com.xiaopo.flying.acamera.ACameraCharacteristics;
-import com.xiaopo.flying.acamera.base.Supplier;
-import com.xiaopo.flying.acamera.model.FaceDetectMode;
-import com.xiaopo.flying.acamera.model.FlashMode;
-import com.xiaopo.flying.acamera.model.FocusMode;
-import com.xiaopo.flying.acamera.model.ZoomedCropRegionSupplier;
+import com.xiaopo.flying.acamera.state.CameraStateManager;
 
 import io.reactivex.subjects.BehaviorSubject;
 
@@ -21,14 +15,14 @@ import io.reactivex.subjects.BehaviorSubject;
 public class RequestFactory {
 
   private final CameraDevice cameraDevice;
-  private final ACameraCharacteristics aCameraCharacteristics;
+  private final CameraStateManager cameraStateManager;
   private final BehaviorSubject<Surface> previewSurfaceSubject;
 
   public RequestFactory(CameraDevice cameraDevice,
-                        ACameraCharacteristics aCameraCharacteristics,
+                        CameraStateManager cameraStateManager,
                         BehaviorSubject<Surface> previewSurfaceSubject) {
     this.cameraDevice = cameraDevice;
-    this.aCameraCharacteristics = aCameraCharacteristics;
+    this.cameraStateManager = cameraStateManager;
     this.previewSurfaceSubject = previewSurfaceSubject;
   }
 
@@ -44,37 +38,39 @@ public class RequestFactory {
     return null;
   }
 
-  public RequestTemplate createPreviewTemplate() {
-    Supplier<Float> zoomSetting = new Supplier<Float>() {
-      @Override
-      public Float get() {
-        return 1f;
-      }
-    };
-    Supplier<Rect> cropRegion =
-        new ZoomedCropRegionSupplier(aCameraCharacteristics.getSensorInfoActiveArraySize(), zoomSetting);
+  public RequestTemplate.Builder createPreviewTemplate() {
 
     return create(CameraDevice.TEMPLATE_PREVIEW)
-        .withFocusModeSupplier(new Supplier<FocusMode>() {
-          @Override
-          public FocusMode get() {
-            return FocusMode.CONTINUOUS_PICTURE;
-          }
-        })
-        .withFaceDetectModeSupplier(new Supplier<FaceDetectMode>() {
-          @Override
-          public FaceDetectMode get() {
-            return FaceDetectMode.NONE;
-          }
-        })
-        .withFlashModeSupplier(new Supplier<FlashMode>() {
-          @Override
-          public FlashMode get() {
-            return FlashMode.AUTO;
-          }
-        })
-        .withCropRegionModeSupplier(cropRegion)
-        .addSurface(previewSurfaceSubject.getValue())
-        .build();
+        .withFocusModeSupplier(cameraStateManager.getFocusModeState())
+        .withFaceDetectModeSupplier(cameraStateManager.getFaceDetectModeState())
+        .withFlashModeSupplier(cameraStateManager.getFlashModeState())
+        .withCropRegionModeSupplier(cameraStateManager.getZoomedCropRegion())
+        .withAeRegionsSupplier(cameraStateManager.getAeRegionSupplier())
+        .withAfRegionsSupplier(cameraStateManager.getAfRegionSupplier())
+        .addSurface(previewSurfaceSubject.getValue());
+  }
+
+  public RequestTemplate.Builder createAFIdleTemplate() {
+
+    return createPreviewTemplate()
+        .withParam(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
+        .withParam(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
+        .withParam(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+  }
+
+  public RequestTemplate.Builder createAFTriggerTemplate() {
+
+    return createPreviewTemplate()
+        .withParam(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
+        .withParam(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
+        .withParam(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
+  }
+
+  public RequestTemplate.Builder createAFCancelTemplate() {
+
+    return createPreviewTemplate()
+        .withParam(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
+        .withParam(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
+        .withParam(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
   }
 }

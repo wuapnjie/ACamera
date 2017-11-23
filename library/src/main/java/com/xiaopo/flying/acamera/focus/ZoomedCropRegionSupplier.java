@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.xiaopo.flying.acamera.model;
+package com.xiaopo.flying.acamera.focus;
 
 import android.graphics.Rect;
 

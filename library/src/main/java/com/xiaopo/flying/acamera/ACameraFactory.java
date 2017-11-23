@@ -11,17 +11,18 @@ import com.xiaopo.flying.acamera.base.Consumer;
 import com.xiaopo.flying.acamera.base.Lifetime;
 import com.xiaopo.flying.acamera.base.SafeCloseable;
 import com.xiaopo.flying.acamera.base.Supplier;
-import com.xiaopo.flying.acamera.base.optional.Optional;
 import com.xiaopo.flying.acamera.command.CameraCommand;
 import com.xiaopo.flying.acamera.command.CameraCommandBuilder;
 import com.xiaopo.flying.acamera.command.CameraCommandCenter;
 import com.xiaopo.flying.acamera.command.CameraCommandExecutor;
 import com.xiaopo.flying.acamera.command.CameraCommandFactory;
 import com.xiaopo.flying.acamera.command.CameraCommandType;
+import com.xiaopo.flying.acamera.command.FullAFScanCommand;
 import com.xiaopo.flying.acamera.command.PreviewCommand;
 import com.xiaopo.flying.acamera.preview.CaptureSessionCreator;
 import com.xiaopo.flying.acamera.preview.PreviewStarter;
 import com.xiaopo.flying.acamera.request.RequestFactory;
+import com.xiaopo.flying.acamera.state.CameraStateManager;
 
 import java.util.ArrayList;
 
@@ -86,7 +87,11 @@ class ACameraFactory {
   }
 
   private void initRequestFactory() {
-    requestFactory = new RequestFactory(cameraDevice, aCameraCharacteristics, previewSurfaceSubject);
+    CameraStateManager cameraStateManager = new CameraStateManager(aCameraCharacteristics);
+    requestFactory =
+        new RequestFactory(cameraDevice,
+            cameraStateManager,
+            previewSurfaceSubject);
   }
 
   private void initCommandSystem() {
@@ -102,7 +107,14 @@ class ACameraFactory {
         cameraCommandBuilder.add(CameraCommandType.PREVIEW, new Supplier<CameraCommand>() {
           @Override
           public CameraCommand get() {
-            return new PreviewCommand(requestFactory.createPreviewTemplate(), cameraHandler);
+            return new PreviewCommand(requestFactory.createPreviewTemplate().build(), cameraHandler);
+          }
+        });
+
+        cameraCommandBuilder.add(CameraCommandType.SCAN_FAOCUS, new Supplier<CameraCommand>() {
+          @Override
+          public CameraCommand get() {
+            return new FullAFScanCommand(requestFactory, cameraHandler);
           }
         });
       }

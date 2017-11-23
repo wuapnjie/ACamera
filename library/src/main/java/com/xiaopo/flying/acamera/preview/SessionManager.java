@@ -41,7 +41,7 @@ public class SessionManager implements SafeCloseable, Supplier<Optional<CameraCa
     return subject;
   }
 
-  public void emitSession(CameraCaptureSession captureSession) {
+  void emitSession(CameraCaptureSession captureSession) {
     subject.onNext(captureSession);
   }
 

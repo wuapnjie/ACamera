@@ -1,5 +1,7 @@
 package com.xiaopo.flying.acamera.command;
 
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.subjects.PublishSubject;
 
 /**
@@ -29,6 +31,11 @@ public class CameraCommandCenter {
   }
 
   public void nextCommand(CameraCommand cameraCommand) {
+    commandSubject.onNext(cameraCommand);
+  }
+
+  public void nextCommand(CameraCommand cameraCommand, long delay, TimeUnit unit) {
+    cameraCommand.setDelay(delay, unit);
     commandSubject.onNext(cameraCommand);
   }
 
