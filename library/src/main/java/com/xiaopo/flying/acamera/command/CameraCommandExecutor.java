@@ -5,6 +5,7 @@ import android.util.Log;
 import com.xiaopo.flying.acamera.base.SafeCloseable;
 
 import io.reactivex.Observer;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -17,6 +18,7 @@ public class CameraCommandExecutor implements Observer<CameraCommand>, SafeClose
   private Disposable disposable;
   private final Object lock = new Object();
   private boolean closed = false;
+  private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
   @Override
   public void onSubscribe(Disposable d) {
@@ -27,10 +29,11 @@ public class CameraCommandExecutor implements Observer<CameraCommand>, SafeClose
   public void onNext(CameraCommand cameraCommand) {
     if (closed) return;
 
-    cameraCommand
-        .start()
-        .subscribeOn(Schedulers.io())
-        .subscribe();
+    compositeDisposable
+        .add(cameraCommand
+            .start()
+            .subscribeOn(Schedulers.io())
+            .subscribe());
   }
 
   @Override
@@ -49,6 +52,7 @@ public class CameraCommandExecutor implements Observer<CameraCommand>, SafeClose
       closed = true;
       if (!disposable.isDisposed()) {
         disposable.dispose();
+        compositeDisposable.dispose();
       }
     }
   }
