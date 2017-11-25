@@ -28,13 +28,11 @@ public class CameraCommandExecutor implements Observer<CameraCommand>, SafeClose
   public void onNext(CameraCommand cameraCommand) {
     if (closed) return;
 
-    if (currentCommandDisposable != null) {
-      currentCommandDisposable.dispose();
-    }
+    Log.d(TAG, "onNext: camera command : " + cameraCommand.getClass().getSimpleName());
 
-    currentCommandDisposable =
-        cameraCommand
-            .start(Schedulers.io());
+    DisposeLastCommand command = new DisposeLastCommand(cameraCommand, currentCommandDisposable);
+
+    currentCommandDisposable = command.start(Schedulers.io());
   }
 
   @Override
@@ -58,6 +56,30 @@ public class CameraCommandExecutor implements Observer<CameraCommand>, SafeClose
       if (currentCommandDisposable != null) {
         currentCommandDisposable.dispose();
       }
+    }
+  }
+
+  class DisposeLastCommand extends CameraCommand {
+
+    final CameraCommand actualCommand;
+    final Disposable lastCommandDisposable;
+
+    DisposeLastCommand(CameraCommand actualCommand,
+                       Disposable lastCommandDisposable) {
+      this.actualCommand = actualCommand;
+      this.lastCommandDisposable = lastCommandDisposable;
+
+      setDelay(actualCommand.delay, actualCommand.unit);
+    }
+
+    @Override
+    public void run() {
+      if (lastCommandDisposable != null) {
+        lastCommandDisposable.dispose();
+        Log.d(TAG, "run: dispose last");
+      }
+
+      actualCommand.run();
     }
   }
 }

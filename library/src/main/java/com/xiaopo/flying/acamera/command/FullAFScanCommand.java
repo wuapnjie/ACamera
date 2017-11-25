@@ -38,7 +38,7 @@ public class FullAFScanCommand extends CameraCommand implements Consumer<CameraC
           null,
           cameraHandler);
 
-      RequestTemplate cancelBuilder = requestFactory.createAFIdleTemplate().build();
+      RequestTemplate cancelBuilder = requestFactory.createAFCancelTemplate().build();
       captureSession.capture(
           cancelBuilder.generateRequest(),
           null,
@@ -50,7 +50,7 @@ public class FullAFScanCommand extends CameraCommand implements Consumer<CameraC
           null,
           cameraHandler);
 
-      RequestTemplate triggerBuilder = requestFactory.createAFIdleTemplate().build();
+      RequestTemplate triggerBuilder = requestFactory.createAFTriggerTemplate().build();
       captureSession.capture(
           triggerBuilder.generateRequest(),
           null,

@@ -123,4 +123,9 @@ public class ARealCameraCharacteristics
     return cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
   }
 
+  @Override
+  public int getSensorOrientation() {
+    return cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+  }
+
 }

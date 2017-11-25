@@ -18,8 +18,6 @@ import com.xiaopo.flying.acamera.focus.ZoomedCropRegionSupplier;
  * @author wupanjie
  */
 public class CameraStateManager {
-  private final ACameraCharacteristics characteristics;
-
   private final CameraState<FocusMode> focusModeState;
   private final CameraState<FlashMode> flashModeState;
   private final CameraState<FaceDetectMode> faceDetectModeState;
@@ -31,8 +29,6 @@ public class CameraStateManager {
   private final Supplier<MeteringRectangle[]> afRegionSupplier;
 
   public CameraStateManager(ACameraCharacteristics characteristics) {
-    this.characteristics = characteristics;
-
     focusModeState = new CameraState<>(FocusMode.CONTINUOUS_PICTURE);
     flashModeState = new CameraState<>(FlashMode.AUTO);
     faceDetectModeState = new CameraState<>(FaceDetectMode.SIMPLE);

@@ -50,4 +50,6 @@ public interface ACameraCharacteristics {
   List<FaceDetectMode> getSupportedFaceDetectModes();
 
   Rect getSensorInfoActiveArraySize();
+
+  int getSensorOrientation();
 }

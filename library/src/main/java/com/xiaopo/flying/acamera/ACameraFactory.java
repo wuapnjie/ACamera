@@ -19,6 +19,7 @@ import com.xiaopo.flying.acamera.command.CameraCommandFactory;
 import com.xiaopo.flying.acamera.command.CameraCommandType;
 import com.xiaopo.flying.acamera.command.FullAFScanCommand;
 import com.xiaopo.flying.acamera.command.PreviewCommand;
+import com.xiaopo.flying.acamera.focus.FocusTrigger;
 import com.xiaopo.flying.acamera.preview.CaptureSessionCreator;
 import com.xiaopo.flying.acamera.preview.PreviewStarter;
 import com.xiaopo.flying.acamera.request.RequestFactory;
@@ -37,11 +38,15 @@ class ACameraFactory {
   private final Handler cameraHandler;
   private final CameraDevice cameraDevice;
 
+  private CaptureSessionCreator captureSessionCreator;
+  private PreviewStarter previewStarter;
+  private FocusTrigger focusTrigger;
   private CameraCommandFactory commandFactory;
   private RequestFactory requestFactory;
   private ARealCameraCharacteristics aCameraCharacteristics;
   private BehaviorSubject<Surface> previewSurfaceSubject;
   private Lifetime lifetime = new Lifetime();
+  private CameraStateManager cameraStateManager;
 
   ACameraFactory(CameraManager cameraManager, Handler cameraHandler, CameraDevice cameraDevice) {
     this.cameraManager = cameraManager;
@@ -51,11 +56,12 @@ class ACameraFactory {
 
   public ACamera create() {
     try {
-      final CaptureSessionCreator captureSessionCreator =
-          new CaptureSessionCreator(cameraDevice, cameraHandler);
-
       CameraCharacteristics characteristics =
           cameraManager.getCameraCharacteristics(cameraDevice.getId());
+
+      captureSessionCreator =
+          new CaptureSessionCreator(cameraDevice, cameraHandler);
+
       aCameraCharacteristics = new ARealCameraCharacteristics(characteristics);
 
       previewSurfaceSubject = BehaviorSubject.create();
@@ -64,21 +70,15 @@ class ACameraFactory {
 
       initCommandSystem();
 
+      initPreviewStarter();
 
-      PreviewStarter previewStarter = new PreviewStarter(
-          new ArrayList<Surface>(0),
-          captureSessionCreator,
-          commandFactory
-      );
-
-      lifetime.add(previewStarter);
-      lifetime.add(new SafeCloseableHolder<>(cameraDevice));
+      initFocusTrigger();
 
       return new ARealCamera(
           lifetime,
           aCameraCharacteristics,
           previewStarter,
-          previewSurfaceSubject);
+          focusTrigger);
     } catch (CameraAccessException e) {
       e.printStackTrace();
     }
@@ -86,8 +86,28 @@ class ACameraFactory {
     return null;
   }
 
+  private void initFocusTrigger() {
+    focusTrigger = new FocusTrigger(
+        commandFactory,
+        cameraStateManager,
+        aCameraCharacteristics.getSensorOrientation()
+    );
+  }
+
+  private void initPreviewStarter() {
+    previewStarter = new PreviewStarter(
+        new ArrayList<Surface>(0),
+        captureSessionCreator,
+        commandFactory,
+        previewSurfaceSubject
+    );
+
+    lifetime.add(previewStarter);
+    lifetime.add(new SafeCloseableHolder<>(cameraDevice));
+  }
+
   private void initRequestFactory() {
-    CameraStateManager cameraStateManager = new CameraStateManager(aCameraCharacteristics);
+    cameraStateManager = new CameraStateManager(aCameraCharacteristics);
     requestFactory =
         new RequestFactory(cameraDevice,
             cameraStateManager,

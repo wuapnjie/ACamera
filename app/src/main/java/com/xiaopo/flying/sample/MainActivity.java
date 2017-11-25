@@ -28,12 +28,12 @@ import java.util.List;
 
 import io.reactivex.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
+public class MainActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener, TouchableTextureView.OnTapListener {
 
   private static final String TAG = "MainActivity";
   private Handler cameraHandler;
   private CameraManager cameraManager;
-  private TextureView textureView;
+  private TouchableTextureView textureView;
   private SurfaceTexture surfaceTexture;
   private Button btnClose;
 
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     thread.start();
     cameraHandler = new Handler(thread.getLooper());
     cameraManager = AndroidServices.instance().provideCameraManager();
+
+    textureView.setOnTapListener(this);
   }
 
 
@@ -155,6 +157,14 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     if (camera != null) {
       camera.close();
       camera = null;
+    }
+  }
+
+  @Override
+  public void onTap(float x, float y) {
+    Log.d(TAG, "onTap: x : " + x + ", y : " + y);
+    if (camera != null){
+      camera.triggerFocusAt(x, y);
     }
   }
 }

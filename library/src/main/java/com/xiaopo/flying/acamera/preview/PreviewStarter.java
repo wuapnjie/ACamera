@@ -17,26 +17,30 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * @author wupanjie
  */
-public class PreviewStarter implements SafeCloseable{
+public class PreviewStarter implements SafeCloseable {
 
   private final List<Surface> outputSurfaces;
   private final CaptureSessionCreator captureSessionCreator;
   private final CameraCommandFactory commandFactory;
   private CameraCaptureSession currentPreviewSession;
+  private BehaviorSubject<Surface> previewSurfaceSubject;
 
   public PreviewStarter(List<Surface> outputSurfaces,
                         CaptureSessionCreator captureSessionCreator,
-                        CameraCommandFactory commandFactory) {
+                        CameraCommandFactory commandFactory,
+                        BehaviorSubject<Surface> previewSurfaceSubject) {
     this.outputSurfaces = outputSurfaces;
     this.captureSessionCreator = captureSessionCreator;
     this.commandFactory = commandFactory;
+    this.previewSurfaceSubject = previewSurfaceSubject;
   }
 
-  public Completable startPreview(final Surface previewSurface) {
+  public Completable startPreview() {
     // When we have the preview surface, start the capture session.
     List<Surface> surfaceList = new ArrayList<>();
 
@@ -45,12 +49,12 @@ public class PreviewStarter implements SafeCloseable{
     // to lock it as the first stream. Then resend the another session with preview
     // and JPEG stream.
     if (ApiHelper.isLorLMr1() && ApiHelper.IS_NEXUS_5) {
-      surfaceList.add(previewSurface);
+      surfaceList.add(previewSurfaceSubject.getValue());
       captureSessionCreator.createCaptureSession(surfaceList).subscribe();
       surfaceList.addAll(outputSurfaces);
     } else {
       surfaceList.addAll(outputSurfaces);
-      surfaceList.add(previewSurface);
+      surfaceList.add(previewSurfaceSubject.getValue());
     }
 
     return Completable.fromObservable(
@@ -71,8 +75,13 @@ public class PreviewStarter implements SafeCloseable{
     );
   }
 
+  public void setPreviewSurface(Surface previewSurface) {
+    previewSurfaceSubject.onNext(previewSurface);
+  }
+
   @Override
   public void close() {
     currentPreviewSession.close();
+    previewSurfaceSubject.onComplete();
   }
 }

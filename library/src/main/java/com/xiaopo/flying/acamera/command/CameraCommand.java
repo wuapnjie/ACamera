@@ -10,8 +10,8 @@ import io.reactivex.disposables.Disposable;
 
 public abstract class CameraCommand implements Command {
 
-  private long delay = 0L;
-  private TimeUnit unit = TimeUnit.SECONDS;
+  long delay = 0L;
+  TimeUnit unit = TimeUnit.SECONDS;
 
   public Disposable start(Scheduler scheduler) {
     Scheduler.Worker worker = scheduler.createWorker();
@@ -37,5 +37,4 @@ public abstract class CameraCommand implements Command {
     this.delay = delay;
     this.unit = unit;
   }
-
 }

@@ -1,7 +1,7 @@
 package com.xiaopo.flying.acamera.base;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,14 +28,14 @@ public class Lifetime implements SafeCloseable {
 
   public Lifetime() {
     lock = new Object();
-    closeables = new HashSet<>();
+    closeables = new LinkedHashSet<>();
     parent = null;
     closed = false;
   }
 
   public Lifetime(Lifetime parent) {
     lock = new Object();
-    closeables = new HashSet<>();
+    closeables = new LinkedHashSet<>();
     this.parent = parent;
     closed = false;
     this.parent.closeables.add(this);
