@@ -8,6 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * 镜头方向，前置或后置，与系统相关常量一一对应
+ *
  * @author wupanjie
  */
 public enum LensFacing {
@@ -16,11 +17,11 @@ public enum LensFacing {
 
   public final int lensFacingConstant;
 
-  LensFacing(int lensFacingConstant){
+  LensFacing(int lensFacingConstant) {
     this.lensFacingConstant = lensFacingConstant;
   }
 
-  public static LensFacing of(@LensFacingConstant int lensFacingConstant){
+  public static LensFacing of(@LensFacingConstant int lensFacingConstant) {
     switch (lensFacingConstant) {
       case CameraMetadata.LENS_FACING_BACK:
         return BACK;

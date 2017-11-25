@@ -2,7 +2,7 @@ package com.xiaopo.flying.acamera.model;
 
 import android.hardware.camera2.CameraMetadata;
 
-import com.xiaopo.flying.acamera.ACameraCharacteristics;
+import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 
 import java.util.List;
 

@@ -3,8 +3,7 @@ package com.xiaopo.flying.acamera.focus;
 import android.hardware.camera2.params.MeteringRectangle;
 
 /**
- * Contains 3A parameters common to all camera flavors. TODO: Move to
- * GservicesHelper.
+ * Contains 3A parameters common to all camera flavors.
  */
 public class Settings3A {
 
@@ -26,7 +25,7 @@ public class Settings3A {
 
 
   /**
-   * @return  The weight to use for {@link MeteringRectangle}s for 3A.
+   * @return The weight to use for {@link MeteringRectangle}s for 3A.
    */
   public int getMeteringWeight() {
     // TODO Determine the optimal metering region for non-HDR photos.

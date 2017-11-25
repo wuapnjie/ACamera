@@ -7,8 +7,6 @@ import com.xiaopo.flying.acamera.base.Consumer;
 import java.io.Serializable;
 import java.util.Set;
 
-import static com.xiaopo.flying.acamera.base.optional.Preconditions.checkNotNull;
-
 
 /**
  * An immutable object that may contain a non-null reference to another object. Each instance of
@@ -244,8 +242,8 @@ public abstract class Optional<T> implements Serializable {
 
   private static final long serialVersionUID = 0;
 
-  public void ifPresent(Consumer<? super T> consumer){
-    if (isPresent()){
+  public void ifPresent(Consumer<? super T> consumer) {
+    if (isPresent()) {
       consumer.accept(get());
     }
   }

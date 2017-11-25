@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.xiaopo.flying.acamera;
+package com.xiaopo.flying.acamera.characterisitics;
 
 import android.annotation.TargetApi;
 import android.graphics.Rect;

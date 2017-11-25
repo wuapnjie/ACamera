@@ -4,6 +4,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.MeteringRectangle;
+import android.support.annotation.NonNull;
 
 import com.xiaopo.flying.acamera.base.optional.Preconditions;
 
@@ -35,6 +36,7 @@ final class PointMeteringParameters implements MeteringParameters {
    *                          .get(CameraCharacteristics.SENSOR_ORIENTATION).
    * @param settings3A        3A com.plus.camera.settings.
    */
+  @NonNull
   public static PointMeteringParameters createForNormalizedCoordinates(PointF afPoint,
                                                                        PointF aePoint, int sensorOrientation, Settings3A settings3A) {
     Preconditions.checkArgument(sensorOrientation % 90 == 0,
@@ -50,6 +52,7 @@ final class PointMeteringParameters implements MeteringParameters {
    * @param cropRegion The current crop region, see
    *                   {@link CaptureRequest#SCALER_CROP_REGION}.
    */
+  @NonNull
   @Override
   public MeteringRectangle[] getAERegions(Rect cropRegion) {
     return new MeteringRectangle[]{
@@ -61,6 +64,7 @@ final class PointMeteringParameters implements MeteringParameters {
    * @param cropRegion The current crop region, see
    *                   {@link CaptureRequest#SCALER_CROP_REGION}.
    */
+  @NonNull
   @Override
   public MeteringRectangle[] getAFRegions(Rect cropRegion) {
     return new MeteringRectangle[]{
@@ -68,6 +72,7 @@ final class PointMeteringParameters implements MeteringParameters {
     };
   }
 
+  @NonNull
   private MeteringRectangle regionForNormalizedCoord(PointF point, Rect cropRegion) {
     // Compute half side length in pixels.
     int minCropEdge = Math.min(cropRegion.width(), cropRegion.height());

@@ -22,7 +22,7 @@ public enum FlashMode {
     this.cameraFlashConstant = cameraFlashConstant;
   }
 
-  public static FlashMode of(@CameraFlashConstant int cameraFlashConstant){
+  public static FlashMode of(@CameraFlashConstant int cameraFlashConstant) {
     switch (cameraFlashConstant) {
       case CameraMetadata.CONTROL_AE_MODE_OFF:
         return OFF;

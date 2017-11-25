@@ -8,6 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * 相关聚焦模式的枚举，与系统相关常量一一对应
+ *
  * @author wupanjie
  */
 public enum FocusMode {
@@ -40,7 +41,7 @@ public enum FocusMode {
       case CameraMetadata.CONTROL_AF_MODE_OFF:
         return FIXED;
     }
-    
+
     return FIXED;
   }
 

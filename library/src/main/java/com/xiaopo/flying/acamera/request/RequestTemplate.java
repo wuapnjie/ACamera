@@ -12,7 +12,6 @@ import com.xiaopo.flying.acamera.model.FocusMode;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**

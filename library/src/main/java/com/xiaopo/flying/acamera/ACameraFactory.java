@@ -11,6 +11,7 @@ import com.xiaopo.flying.acamera.base.Consumer;
 import com.xiaopo.flying.acamera.base.Lifetime;
 import com.xiaopo.flying.acamera.base.SafeCloseable;
 import com.xiaopo.flying.acamera.base.Supplier;
+import com.xiaopo.flying.acamera.characterisitics.ARealCameraCharacteristics;
 import com.xiaopo.flying.acamera.command.CameraCommand;
 import com.xiaopo.flying.acamera.command.CameraCommandBuilder;
 import com.xiaopo.flying.acamera.command.CameraCommandCenter;

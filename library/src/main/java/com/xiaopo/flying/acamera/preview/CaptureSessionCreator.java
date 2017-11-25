@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.Surface;
 
-
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -21,7 +20,7 @@ public class CaptureSessionCreator {
   private final Handler cameraHandler;
 
 
-  public CaptureSessionCreator(CameraDevice cameraDevice,Handler cameraHandler) {
+  public CaptureSessionCreator(CameraDevice cameraDevice, Handler cameraHandler) {
     this.cameraDevice = cameraDevice;
     this.cameraHandler = cameraHandler;
   }

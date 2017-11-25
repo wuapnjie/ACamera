@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   }
 
 
-  // 成功回调的方法，用注解即可，这里的300就是请求时的requestCode。
   @PermissionYes(300)
   private void getPermissionYes(List<String> grantedPermissions) {
     if (surfaceTexture == null) {

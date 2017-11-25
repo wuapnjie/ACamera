@@ -94,7 +94,7 @@ public class Camera2PreviewSizeSelector implements PreviewSizeSelector {
   }
 
   private int getOptimalPreviewSizeIndex(List<Size> previewSizes, double targetRatio,
-                                               Double aspectRatioTolerance) {
+                                         Double aspectRatioTolerance) {
     if (previewSizes == null) {
       return -1;
     }

@@ -4,6 +4,7 @@ import android.util.Size;
 import android.view.Surface;
 
 import com.xiaopo.flying.acamera.base.SafeCloseable;
+import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.focus.FocusFunction;
 import com.xiaopo.flying.acamera.preview.PreviewSizeSelector;
 

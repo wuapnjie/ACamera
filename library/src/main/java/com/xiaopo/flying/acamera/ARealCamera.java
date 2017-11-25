@@ -4,13 +4,11 @@ import android.util.Size;
 import android.view.Surface;
 
 import com.xiaopo.flying.acamera.base.Lifetime;
-import com.xiaopo.flying.acamera.command.CameraCommandFactory;
+import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.focus.FocusTrigger;
 import com.xiaopo.flying.acamera.preview.Camera2PreviewSizeSelector;
 import com.xiaopo.flying.acamera.preview.PreviewSizeSelector;
 import com.xiaopo.flying.acamera.preview.PreviewStarter;
-
-import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * @author wupanjie

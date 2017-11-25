@@ -3,16 +3,16 @@ package com.xiaopo.flying.acamera.state;
 import android.graphics.Rect;
 import android.hardware.camera2.params.MeteringRectangle;
 
-import com.xiaopo.flying.acamera.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.base.Supplier;
+import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.focus.AEMeteringRegionSupplier;
 import com.xiaopo.flying.acamera.focus.AFMeteringRegionSupplier;
 import com.xiaopo.flying.acamera.focus.GlobalMeteringParameters;
 import com.xiaopo.flying.acamera.focus.MeteringParameters;
+import com.xiaopo.flying.acamera.focus.ZoomedCropRegionSupplier;
 import com.xiaopo.flying.acamera.model.FaceDetectMode;
 import com.xiaopo.flying.acamera.model.FlashMode;
 import com.xiaopo.flying.acamera.model.FocusMode;
-import com.xiaopo.flying.acamera.focus.ZoomedCropRegionSupplier;
 
 /**
  * @author wupanjie

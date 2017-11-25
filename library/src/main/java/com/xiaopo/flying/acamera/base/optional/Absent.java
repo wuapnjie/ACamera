@@ -5,8 +5,6 @@ import android.support.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.xiaopo.flying.acamera.base.optional.Preconditions.checkNotNull;
-
 
 /**
  * Implementation of an {@link Optional} not containing a reference.
