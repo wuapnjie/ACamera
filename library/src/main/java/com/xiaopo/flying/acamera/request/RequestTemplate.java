@@ -1,6 +1,7 @@
 package com.xiaopo.flying.acamera.request;
 
 import android.graphics.Rect;
+import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.view.Surface;
@@ -9,6 +10,9 @@ import com.xiaopo.flying.acamera.base.Supplier;
 import com.xiaopo.flying.acamera.model.FaceDetectMode;
 import com.xiaopo.flying.acamera.model.FlashMode;
 import com.xiaopo.flying.acamera.model.FocusMode;
+import com.xiaopo.flying.acamera.result.CaptureListener;
+import com.xiaopo.flying.acamera.result.CompositeCaptureListener;
+import com.xiaopo.flying.acamera.result.ForwardCaptureCallback;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +32,7 @@ public class RequestTemplate {
   private final Supplier<MeteringRectangle[]> afRegionsSupplier;
   private final HashSet<Surface> surfaces;
   private final HashMap<CaptureRequest.Key, ?> params;
+  private final CaptureListener captureListener;
 
   private RequestTemplate(Builder builder) {
     this.requestBuilder = builder.requestBuilder;
@@ -40,6 +45,7 @@ public class RequestTemplate {
     this.afRegionsSupplier = builder.afRegionsSupplier;
     this.surfaces = builder.surfaces;
     this.params = builder.params;
+    this.captureListener = builder.captureListener;
   }
 
   public CaptureRequest.Builder getRequestBuilder() {
@@ -64,6 +70,10 @@ public class RequestTemplate {
 
   public Set<Surface> getSurfaces() {
     return surfaces;
+  }
+
+  public CameraCaptureSession.CaptureCallback getCaptureCallback() {
+    return new ForwardCaptureCallback(captureListener);
   }
 
   public CaptureRequest generateRequest() {
@@ -112,6 +122,7 @@ public class RequestTemplate {
     return requestBuilder.build();
   }
 
+
   public static class Builder {
     private final CaptureRequest.Builder requestBuilder;
 
@@ -123,6 +134,7 @@ public class RequestTemplate {
     private Supplier<MeteringRectangle[]> afRegionsSupplier;
     private HashSet<Surface> surfaces = new HashSet<>();
     private HashMap<CaptureRequest.Key, Object> params = new HashMap<>();
+    private CompositeCaptureListener captureListener = new CompositeCaptureListener();
 
     public Builder(CaptureRequest.Builder requestBuilder) {
       this.requestBuilder = requestBuilder;
@@ -168,6 +180,11 @@ public class RequestTemplate {
 
     public <T> Builder withParam(CaptureRequest.Key<T> key, T value) {
       this.params.put(key, value);
+      return this;
+    }
+
+    public Builder addListener(CaptureListener listener) {
+      this.captureListener.add(listener);
       return this;
     }
 

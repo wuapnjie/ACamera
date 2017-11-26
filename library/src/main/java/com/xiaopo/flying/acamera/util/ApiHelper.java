@@ -84,7 +84,6 @@ public class ApiHelper {
   }
 
   public static boolean isKitKatOrHigher() {
-    // TODO: Remove CODENAME check as soon as VERSION_CODES.KITKAT is final.
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT || "KeyLimePie".equals(
         Build.VERSION.CODENAME);
   }

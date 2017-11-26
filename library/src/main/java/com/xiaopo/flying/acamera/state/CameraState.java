@@ -1,6 +1,7 @@
 package com.xiaopo.flying.acamera.state;
 
 import com.xiaopo.flying.acamera.base.Supplier;
+import com.xiaopo.flying.acamera.base.Updatable;
 
 import io.reactivex.Observer;
 import io.reactivex.subjects.BehaviorSubject;
@@ -8,7 +9,7 @@ import io.reactivex.subjects.BehaviorSubject;
 /**
  * @author wupanjie
  */
-public class CameraState<T> implements Supplier<T> {
+public class CameraState<T> implements Supplier<T>, Updatable<T> {
 
   private BehaviorSubject<T> stateSubject;
 
@@ -16,6 +17,7 @@ public class CameraState<T> implements Supplier<T> {
     stateSubject = BehaviorSubject.createDefault(defaultValue);
   }
 
+  @Override
   public void update(T newValue) {
     stateSubject.onNext(newValue);
   }

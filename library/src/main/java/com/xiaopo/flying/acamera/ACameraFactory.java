@@ -20,13 +20,17 @@ import com.xiaopo.flying.acamera.command.CameraCommandFactory;
 import com.xiaopo.flying.acamera.command.CameraCommandType;
 import com.xiaopo.flying.acamera.command.FullAFScanCommand;
 import com.xiaopo.flying.acamera.command.PreviewCommand;
-import com.xiaopo.flying.acamera.focus.FocusTrigger;
+import com.xiaopo.flying.acamera.focus.AutoFocusStateListener;
+import com.xiaopo.flying.acamera.focus.AutoFocusTrigger;
+import com.xiaopo.flying.acamera.picturetaker.PictureTaker;
+import com.xiaopo.flying.acamera.picturetaker.StillSurfaceReader;
 import com.xiaopo.flying.acamera.preview.CaptureSessionCreator;
 import com.xiaopo.flying.acamera.preview.PreviewStarter;
 import com.xiaopo.flying.acamera.request.RequestFactory;
+import com.xiaopo.flying.acamera.result.CaptureListener;
 import com.xiaopo.flying.acamera.state.CameraStateManager;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
 import io.reactivex.subjects.BehaviorSubject;
 
@@ -41,13 +45,16 @@ class ACameraFactory {
 
   private CaptureSessionCreator captureSessionCreator;
   private PreviewStarter previewStarter;
-  private FocusTrigger focusTrigger;
+  private AutoFocusTrigger focusTrigger;
   private CameraCommandFactory commandFactory;
   private RequestFactory requestFactory;
   private ARealCameraCharacteristics aCameraCharacteristics;
   private BehaviorSubject<Surface> previewSurfaceSubject;
   private Lifetime lifetime = new Lifetime();
   private CameraStateManager cameraStateManager;
+  private CaptureListener defaultListener;
+  private StillSurfaceReader stillSurfaceReader;
+  private PictureTaker pictureTaker;
 
   ACameraFactory(CameraManager cameraManager, Handler cameraHandler, CameraDevice cameraDevice) {
     this.cameraManager = cameraManager;
@@ -60,12 +67,10 @@ class ACameraFactory {
       CameraCharacteristics characteristics =
           cameraManager.getCameraCharacteristics(cameraDevice.getId());
 
-      captureSessionCreator =
-          new CaptureSessionCreator(cameraDevice, cameraHandler);
-
       aCameraCharacteristics = new ARealCameraCharacteristics(characteristics);
-
+      cameraStateManager = new CameraStateManager(aCameraCharacteristics);
       previewSurfaceSubject = BehaviorSubject.create();
+      stillSurfaceReader = new StillSurfaceReader(cameraHandler, cameraStateManager);
 
       initRequestFactory();
 
@@ -75,11 +80,14 @@ class ACameraFactory {
 
       initFocusTrigger();
 
+      initPictureTaker();
+
       return new ARealCamera(
           lifetime,
           aCameraCharacteristics,
           previewStarter,
-          focusTrigger);
+          focusTrigger,
+          pictureTaker);
     } catch (CameraAccessException e) {
       e.printStackTrace();
     }
@@ -87,8 +95,12 @@ class ACameraFactory {
     return null;
   }
 
+  private void initPictureTaker() {
+    pictureTaker = new PictureTaker();
+  }
+
   private void initFocusTrigger() {
-    focusTrigger = new FocusTrigger(
+    focusTrigger = new AutoFocusTrigger(
         commandFactory,
         cameraStateManager,
         aCameraCharacteristics.getSensorOrientation()
@@ -96,8 +108,10 @@ class ACameraFactory {
   }
 
   private void initPreviewStarter() {
+    captureSessionCreator =
+        new CaptureSessionCreator(cameraDevice, cameraHandler);
     previewStarter = new PreviewStarter(
-        new ArrayList<Surface>(0),
+        Arrays.asList(stillSurfaceReader.getSurface()),
         captureSessionCreator,
         commandFactory,
         previewSurfaceSubject
@@ -108,11 +122,13 @@ class ACameraFactory {
   }
 
   private void initRequestFactory() {
-    cameraStateManager = new CameraStateManager(aCameraCharacteristics);
+
+    defaultListener = new AutoFocusStateListener();
     requestFactory =
         new RequestFactory(cameraDevice,
             cameraStateManager,
-            previewSurfaceSubject);
+            previewSurfaceSubject,
+            defaultListener);
   }
 
   private void initCommandSystem() {

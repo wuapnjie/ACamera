@@ -9,6 +9,8 @@ import com.xiaopo.flying.acamera.preview.SessionManager;
 import com.xiaopo.flying.acamera.request.RequestFactory;
 import com.xiaopo.flying.acamera.request.RequestTemplate;
 
+import java.util.Arrays;
+
 /**
  * @author wupanjie
  */
@@ -29,31 +31,32 @@ public class FullAFScanCommand extends CameraCommand implements Consumer<CameraC
         .ifPresent(this);
   }
 
+  @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
   @Override
   public void accept(CameraCaptureSession captureSession) {
     try {
       RequestTemplate idleBuilder = requestFactory.createAFIdleTemplate().build();
-      captureSession.setRepeatingRequest(
-          idleBuilder.generateRequest(),
-          null,
+      captureSession.setRepeatingBurst(
+          Arrays.asList(idleBuilder.generateRequest()),
+          idleBuilder.getCaptureCallback(),
           cameraHandler);
 
       RequestTemplate cancelBuilder = requestFactory.createAFCancelTemplate().build();
-      captureSession.capture(
-          cancelBuilder.generateRequest(),
-          null,
+      captureSession.captureBurst(
+          Arrays.asList(cancelBuilder.generateRequest()),
+          cancelBuilder.getCaptureCallback(),
           cameraHandler);
 
       idleBuilder = requestFactory.createAFIdleTemplate().build();
-      captureSession.setRepeatingRequest(
-          idleBuilder.generateRequest(),
-          null,
+      captureSession.setRepeatingBurst(
+          Arrays.asList(idleBuilder.generateRequest()),
+          idleBuilder.getCaptureCallback(),
           cameraHandler);
 
       RequestTemplate triggerBuilder = requestFactory.createAFTriggerTemplate().build();
-      captureSession.capture(
-          triggerBuilder.generateRequest(),
-          null,
+      captureSession.captureBurst(
+          Arrays.asList(triggerBuilder.generateRequest()),
+          triggerBuilder.getCaptureCallback(),
           cameraHandler);
     } catch (CameraAccessException e) {
       e.printStackTrace();

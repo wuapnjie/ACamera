@@ -5,6 +5,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.view.Surface;
 
+import com.xiaopo.flying.acamera.result.CaptureListener;
 import com.xiaopo.flying.acamera.state.CameraStateManager;
 
 import io.reactivex.subjects.BehaviorSubject;
@@ -17,20 +18,23 @@ public class RequestFactory {
   private final CameraDevice cameraDevice;
   private final CameraStateManager cameraStateManager;
   private final BehaviorSubject<Surface> previewSurfaceSubject;
+  private final CaptureListener defaultListener;
 
   public RequestFactory(CameraDevice cameraDevice,
                         CameraStateManager cameraStateManager,
-                        BehaviorSubject<Surface> previewSurfaceSubject) {
+                        BehaviorSubject<Surface> previewSurfaceSubject,
+                        CaptureListener defaultListener) {
     this.cameraDevice = cameraDevice;
     this.cameraStateManager = cameraStateManager;
     this.previewSurfaceSubject = previewSurfaceSubject;
+    this.defaultListener = defaultListener;
   }
 
   public RequestTemplate.Builder create(int templateType) {
 
     try {
       final CaptureRequest.Builder requestBuilder = cameraDevice.createCaptureRequest(templateType);
-      return new RequestTemplate.Builder(requestBuilder);
+      return new RequestTemplate.Builder(requestBuilder).addListener(defaultListener);
     } catch (CameraAccessException e) {
       e.printStackTrace();
     }

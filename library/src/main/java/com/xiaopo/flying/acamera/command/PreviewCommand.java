@@ -8,6 +8,8 @@ import com.xiaopo.flying.acamera.base.Consumer;
 import com.xiaopo.flying.acamera.preview.SessionManager;
 import com.xiaopo.flying.acamera.request.RequestTemplate;
 
+import java.util.Arrays;
+
 
 /**
  * @author wupanjie
@@ -30,10 +32,11 @@ public class PreviewCommand extends CameraCommand implements Consumer<CameraCapt
         .ifPresent(this);
   }
 
+  @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
   @Override
   public void accept(CameraCaptureSession captureSession) {
     try {
-      captureSession.setRepeatingRequest(previewRequest.generateRequest(), null, cameraHandler);
+      captureSession.setRepeatingBurst(Arrays.asList(previewRequest.generateRequest()), null, cameraHandler);
     } catch (CameraAccessException e) {
       e.printStackTrace();
     }

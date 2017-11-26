@@ -1,7 +1,9 @@
 package com.xiaopo.flying.acamera.state;
 
+import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.hardware.camera2.params.MeteringRectangle;
+import android.util.Size;
 
 import com.xiaopo.flying.acamera.base.Supplier;
 import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
@@ -14,6 +16,9 @@ import com.xiaopo.flying.acamera.model.FaceDetectMode;
 import com.xiaopo.flying.acamera.model.FlashMode;
 import com.xiaopo.flying.acamera.model.FocusMode;
 
+import java.util.Collections;
+import java.util.Comparator;
+
 /**
  * @author wupanjie
  */
@@ -23,6 +28,7 @@ public class CameraStateManager {
   private final CameraState<FaceDetectMode> faceDetectModeState;
   private final CameraState<Float> zoomState;
   private final CameraState<MeteringParameters> meteringState;
+  private final CameraState<Size> pictureSizeState;
 
   private final Supplier<Rect> zoomedCropRegion;
   private final Supplier<MeteringRectangle[]> aeRegionSupplier;
@@ -34,6 +40,13 @@ public class CameraStateManager {
     faceDetectModeState = new CameraState<>(FaceDetectMode.SIMPLE);
     zoomState = new CameraState<>(1.0f);
     meteringState = new CameraState<>(GlobalMeteringParameters.create());
+    pictureSizeState = new CameraState<>(Collections.max(characteristics.getSupportedPictureSizes(ImageFormat.JPEG), new Comparator<Size>() {
+      @Override
+      public int compare(Size lhs, Size rhs) {
+        return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+            (long) rhs.getWidth() * rhs.getHeight());
+      }
+    }));
 
     zoomedCropRegion = new ZoomedCropRegionSupplier(characteristics.getSensorInfoActiveArraySize(), zoomState);
     aeRegionSupplier = new AEMeteringRegionSupplier(meteringState, zoomedCropRegion);
@@ -58,6 +71,10 @@ public class CameraStateManager {
 
   public CameraState<MeteringParameters> getMeteringState() {
     return meteringState;
+  }
+
+  public CameraState<Size> getPictureSizeState() {
+    return pictureSizeState;
   }
 
   public Supplier<Rect> getZoomedCropRegion() {

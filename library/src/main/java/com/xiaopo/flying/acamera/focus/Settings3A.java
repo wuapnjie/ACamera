@@ -28,7 +28,6 @@ public class Settings3A {
    * @return The weight to use for {@link MeteringRectangle}s for 3A.
    */
   public int getMeteringWeight() {
-    // TODO Determine the optimal metering region for non-HDR photos.
     int weightMin = MeteringRectangle.METERING_WEIGHT_MIN;
     int weightRange = MeteringRectangle.METERING_WEIGHT_MAX - MeteringRectangle.METERING_WEIGHT_MIN;
     return (int) (weightMin + GCAM_METERING_REGION_FRACTION * weightRange);
@@ -39,7 +38,6 @@ public class Settings3A {
    * the smallest dimension of the current crop-region.
    */
   public float getMeteringRegionFraction() {
-    // TODO Determine the optimal metering weight for non-HDR photos.
     return GCAM_METERING_REGION_FRACTION;
   }
 

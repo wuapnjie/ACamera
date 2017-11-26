@@ -26,7 +26,6 @@ public class Camera2PreviewSizeSelector implements PreviewSizeSelector {
 
   public Size pickPreviewSize(Size pictureSize) {
     if (pictureSize == null) {
-      // TODO The default should be selected by the caller, and
       // pictureSize should never be null.
       pictureSize = getLargestPictureSize();
     }
