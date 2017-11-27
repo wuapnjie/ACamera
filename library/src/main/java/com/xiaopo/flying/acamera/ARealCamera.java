@@ -66,7 +66,7 @@ class ARealCamera implements ACamera {
 
   @Override
   public void takePicture() {
-
+    pictureTaker.takePicture();
   }
 
   @Override

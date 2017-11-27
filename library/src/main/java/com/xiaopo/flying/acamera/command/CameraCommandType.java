@@ -5,5 +5,6 @@ package com.xiaopo.flying.acamera.command;
  */
 public enum CameraCommandType {
   PREVIEW,
-  SCAN_FAOCUS
+  SCAN_FOCUS,
+  CAPTURE
 }

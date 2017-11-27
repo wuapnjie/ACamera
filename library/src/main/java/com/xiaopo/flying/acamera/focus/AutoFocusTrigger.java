@@ -51,7 +51,7 @@ public class AutoFocusTrigger implements FocusFunction, Consumer<PointF> {
     cameraState.update(PointMeteringParameters.createForNormalizedCoordinates(point /* afPoint */, point /* aePoint */,
         sensorOrientation, settings3A));
 
-    CameraCommand focusCommand = commandFactory.create(CameraCommandType.SCAN_FAOCUS);
+    CameraCommand focusCommand = commandFactory.create(CameraCommandType.SCAN_FOCUS);
     CameraCommandCenter.getInstance().nextCommand(focusCommand);
 
     CameraCommand previewCommand = commandFactory.create(CameraCommandType.PREVIEW);

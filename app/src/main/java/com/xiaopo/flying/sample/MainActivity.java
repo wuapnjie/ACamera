@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   private CameraManager cameraManager;
   private TouchableTextureView textureView;
   private SurfaceTexture surfaceTexture;
-  private Button btnClose;
+  private Button btnTake;
 
   private ACamera camera;
 
@@ -45,11 +45,11 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     setContentView(R.layout.activity_main);
 
     textureView = findViewById(R.id.preview_content);
-    btnClose = findViewById(R.id.btn_close);
-    btnClose.setOnClickListener(new View.OnClickListener() {
+    btnTake = findViewById(R.id.btn_take);
+    btnTake.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        closeCamera();
+        camera.takePicture();
       }
     });
 
@@ -128,7 +128,8 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
           @Override
           public void accept(ACamera aCamera) throws Exception {
             Log.d(TAG, "accept: aCamera");
-            camera = aCamera;;
+            camera = aCamera;
+            ;
 
             surfaceTexture.setDefaultBufferSize(1280, 960);
 
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   @Override
   public void onTap(float x, float y) {
     Log.d(TAG, "onTap: x : " + x + ", y : " + y);
-    if (camera != null){
+    if (camera != null) {
       camera.triggerFocusAt(x, y);
     }
   }

@@ -31,6 +31,6 @@ public class AutoFocusStateListener implements CaptureListener{
 
   @Override
   public void onFailed(@NonNull CaptureFailure failure) {
-    Log.d(TAG, "onFailed: ");
+    Log.d(TAG, "onFailed: " + failure.toString());
   }
 }

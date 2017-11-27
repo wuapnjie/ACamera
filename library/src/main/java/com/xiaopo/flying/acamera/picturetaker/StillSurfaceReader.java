@@ -19,6 +19,7 @@ import java.util.concurrent.CountDownLatch;
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class StillSurfaceReader {
+  private static final String TAG = "StillSurfaceReader";
 
   private ImageReader imageReader;
   private final Handler cameraHandler;
@@ -61,7 +62,7 @@ public class StillSurfaceReader {
             size.getWidth(),
             size.getHeight(),
             ImageFormat.JPEG,
-            1
+            15
         );
 
   }
@@ -84,15 +85,15 @@ public class StillSurfaceReader {
       Image image = imageReader.acquireLatestImage();
       if (image != null) {
         removeListener();
-        return imageToBytes(image);
+        bytes = imageToBytes(image);
+        return bytes;
       }
 
       try {
         countDownLatch.await();
       } catch (InterruptedException e) {
-        // Do nothing
+        e.printStackTrace();
       }
-
       return bytes;
     }
 

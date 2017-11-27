@@ -77,4 +77,16 @@ public class RequestFactory {
         .withParam(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
         .withParam(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
   }
+
+  public RequestTemplate.Builder createCaptureTemplate() {
+
+    return create(CameraDevice.TEMPLATE_STILL_CAPTURE)
+        .withFocusModeSupplier(cameraStateManager.getFocusModeState())
+        .withFaceDetectModeSupplier(cameraStateManager.getFaceDetectModeState())
+        .withFlashModeSupplier(cameraStateManager.getFlashModeState())
+        .withCropRegionModeSupplier(cameraStateManager.getZoomedCropRegion())
+        .withAeRegionsSupplier(cameraStateManager.getAeRegionSupplier())
+        .withAfRegionsSupplier(cameraStateManager.getAfRegionSupplier())
+        .addSurface(previewSurfaceSubject.getValue());
+  }
 }

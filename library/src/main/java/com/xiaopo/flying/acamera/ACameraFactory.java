@@ -18,6 +18,7 @@ import com.xiaopo.flying.acamera.command.CameraCommandCenter;
 import com.xiaopo.flying.acamera.command.CameraCommandExecutor;
 import com.xiaopo.flying.acamera.command.CameraCommandFactory;
 import com.xiaopo.flying.acamera.command.CameraCommandType;
+import com.xiaopo.flying.acamera.command.CaptureCommand;
 import com.xiaopo.flying.acamera.command.FullAFScanCommand;
 import com.xiaopo.flying.acamera.command.PreviewCommand;
 import com.xiaopo.flying.acamera.focus.AutoFocusStateListener;
@@ -96,7 +97,7 @@ class ACameraFactory {
   }
 
   private void initPictureTaker() {
-    pictureTaker = new PictureTaker();
+    pictureTaker = new PictureTaker(commandFactory);
   }
 
   private void initFocusTrigger() {
@@ -148,10 +149,17 @@ class ACameraFactory {
           }
         });
 
-        cameraCommandBuilder.add(CameraCommandType.SCAN_FAOCUS, new Supplier<CameraCommand>() {
+        cameraCommandBuilder.add(CameraCommandType.SCAN_FOCUS, new Supplier<CameraCommand>() {
           @Override
           public CameraCommand get() {
             return new FullAFScanCommand(requestFactory, cameraHandler);
+          }
+        });
+
+        cameraCommandBuilder.add(CameraCommandType.CAPTURE, new Supplier<CameraCommand>() {
+          @Override
+          public CameraCommand get() {
+            return new CaptureCommand(requestFactory, cameraHandler, stillSurfaceReader);
           }
         });
       }
