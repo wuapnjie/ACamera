@@ -3,6 +3,7 @@ package com.xiaopo.flying.acamera.command;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.os.Handler;
+import android.util.Log;
 
 import com.xiaopo.flying.acamera.base.Consumer;
 import com.xiaopo.flying.acamera.picturetaker.StillSurfaceReader;
@@ -16,6 +17,7 @@ import java.util.Arrays;
  * @author wupanjie
  */
 public class CaptureCommand extends CameraCommand implements Consumer<CameraCaptureSession> {
+  private static final String TAG = "CaptureCommand";
 
   private final RequestFactory requestFactory;
   private final Handler cameraHandler;
@@ -42,11 +44,21 @@ public class CaptureCommand extends CameraCommand implements Consumer<CameraCapt
               .addSurface(surfaceReader.getSurface())
               .build();
 
-
       captureSession.captureBurst(
           Arrays.asList(captureBuilder.generateRequest()),
           captureBuilder.getCaptureCallback(),
           cameraHandler);
+
+      // TODO process the image data
+      byte[] image = surfaceReader.getPhotoBytes();
+      Log.d(TAG, "accept: image -> " + image.length);
+
+      RequestTemplate previewBuilder = requestFactory.createPreviewTemplate().build();
+      captureSession.setRepeatingBurst(
+          Arrays.asList(previewBuilder.generateRequest()),
+          captureBuilder.getCaptureCallback(),
+          cameraHandler
+      );
 
 //      captureSession.capture(
 //          captureBuilder.generateRequest(),

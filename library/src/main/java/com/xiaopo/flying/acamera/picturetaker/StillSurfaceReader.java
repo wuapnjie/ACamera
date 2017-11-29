@@ -82,7 +82,7 @@ public class StillSurfaceReader {
     }
 
     private byte[] getPhoto() {
-      Image image = imageReader.acquireLatestImage();
+      Image image = imageReader.acquireNextImage();
       if (image != null) {
         removeListener();
         bytes = imageToBytes(image);
