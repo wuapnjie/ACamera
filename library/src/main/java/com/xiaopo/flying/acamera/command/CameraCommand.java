@@ -7,13 +7,15 @@ import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.SingleSubject;
 
-public abstract class CameraCommand implements Command {
+public abstract class CameraCommand<T> implements Command {
 
   long delay = 0L;
   TimeUnit unit = TimeUnit.SECONDS;
+  private SingleSubject deferredResult;
 
-  public Disposable start(Scheduler scheduler) {
+  Disposable start(Scheduler scheduler) {
     Scheduler.Worker worker = scheduler.createWorker();
     return worker.schedule(this, delay, unit);
   }
@@ -36,5 +38,14 @@ public abstract class CameraCommand implements Command {
   void setDelay(long delay, TimeUnit unit) {
     this.delay = delay;
     this.unit = unit;
+  }
+
+  @SuppressWarnings("unchecked")
+  SingleSubject<T> getDeferredResult() {
+    return (SingleSubject<T>) deferredResult;
+  }
+
+  public void setDeferredResult(SingleSubject deferredResult) {
+    this.deferredResult = deferredResult;
   }
 }

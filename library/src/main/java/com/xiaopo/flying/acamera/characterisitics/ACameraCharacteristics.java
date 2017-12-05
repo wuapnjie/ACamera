@@ -21,6 +21,7 @@ import android.graphics.Rect;
 import android.util.Size;
 
 import com.xiaopo.flying.acamera.model.FaceDetectMode;
+import com.xiaopo.flying.acamera.model.LensFacing;
 
 import java.util.List;
 
@@ -52,4 +53,7 @@ public interface ACameraCharacteristics {
   Rect getSensorInfoActiveArraySize();
 
   int getSensorOrientation();
+
+  LensFacing getLensFacing();
+
 }

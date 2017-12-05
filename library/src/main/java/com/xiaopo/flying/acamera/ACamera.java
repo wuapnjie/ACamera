@@ -6,9 +6,12 @@ import android.view.Surface;
 import com.xiaopo.flying.acamera.base.SafeCloseable;
 import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.focus.FocusFunction;
+import com.xiaopo.flying.acamera.model.Photo;
 import com.xiaopo.flying.acamera.picturetaker.PictureTakeFunction;
 import com.xiaopo.flying.acamera.picturetaker.PictureTaker;
 import com.xiaopo.flying.acamera.preview.PreviewSizeSelector;
+
+import io.reactivex.Single;
 
 /**
  * @author wupanjie
@@ -30,7 +33,7 @@ public interface ACamera extends
 
   // TODO
   @Override
-  void takePicture();
+  Single<Photo> takePicture();
 
   void close();
 }

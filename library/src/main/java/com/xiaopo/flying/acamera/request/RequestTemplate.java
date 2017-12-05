@@ -30,6 +30,7 @@ public class RequestTemplate {
   private final Supplier<Rect> cropRegionSupplier;
   private final Supplier<MeteringRectangle[]> aeRegionsSupplier;
   private final Supplier<MeteringRectangle[]> afRegionsSupplier;
+  private final Supplier<Integer> imageRotationSupplier;
   private final HashSet<Surface> surfaces;
   private final HashMap<CaptureRequest.Key, ?> params;
   private final CaptureListener captureListener;
@@ -43,6 +44,7 @@ public class RequestTemplate {
     this.cropRegionSupplier = builder.cropRegionSupplier;
     this.aeRegionsSupplier = builder.aeRegionsSupplier;
     this.afRegionsSupplier = builder.afRegionsSupplier;
+    this.imageRotationSupplier = builder.imageRotationSupplier;
     this.surfaces = builder.surfaces;
     this.params = builder.params;
     this.captureListener = builder.captureListener;
@@ -106,13 +108,19 @@ public class RequestTemplate {
       requestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS,
           afRegionsSupplier.get());
     }
+    if (imageRotationSupplier != null) {
+      requestBuilder.set(CaptureRequest.JPEG_ORIENTATION,
+          imageRotationSupplier.get());
+    }
 
-    // TODO
+    // TODO to be supplier
     requestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, 0);
     requestBuilder.set(CaptureRequest.CONTROL_MODE,
         CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
     requestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
         CaptureRequest.CONTROL_SCENE_MODE_FACE_PRIORITY);
+    requestBuilder.set(CaptureRequest.JPEG_QUALITY,
+        (byte) 90);
 
 
     for (CaptureRequest.Key key : params.keySet()) {
@@ -132,6 +140,7 @@ public class RequestTemplate {
     private Supplier<Rect> cropRegionSupplier;
     private Supplier<MeteringRectangle[]> aeRegionsSupplier;
     private Supplier<MeteringRectangle[]> afRegionsSupplier;
+    private Supplier<Integer> imageRotationSupplier;
     private HashSet<Surface> surfaces = new HashSet<>();
     private HashMap<CaptureRequest.Key, Object> params = new HashMap<>();
     private CompositeCaptureListener captureListener = new CompositeCaptureListener();
@@ -175,6 +184,11 @@ public class RequestTemplate {
 
     public Builder withAfRegionsSupplier(Supplier<MeteringRectangle[]> afRegionsSupplier) {
       this.afRegionsSupplier = afRegionsSupplier;
+      return this;
+    }
+
+    public Builder withImageRotationSupplier(Supplier<Integer> imageRotationSupplier) {
+      this.imageRotationSupplier = imageRotationSupplier;
       return this;
     }
 

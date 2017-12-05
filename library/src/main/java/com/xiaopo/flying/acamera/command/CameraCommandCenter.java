@@ -7,7 +7,7 @@ import io.reactivex.subjects.PublishSubject;
 /**
  * @author wupanjie
  */
-public class CameraCommandCenter {
+public class CameraCommandCenter implements AutoCloseable{
   private final PublishSubject<CameraCommand> commandSubject;
   private static CameraCommandCenter instance;
 
@@ -41,5 +41,11 @@ public class CameraCommandCenter {
 
   public void registerExecutor(CameraCommandExecutor commandExecutor) {
     commandSubject.subscribe(commandExecutor);
+  }
+
+  @Override
+  public void close() throws Exception {
+    commandSubject.onComplete();
+    instance = null;
   }
 }

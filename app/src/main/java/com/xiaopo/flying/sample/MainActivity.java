@@ -1,6 +1,8 @@
 package com.xiaopo.flying.sample;
 
 import android.Manifest;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -9,24 +11,31 @@ import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.media.ExifInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.xiaopo.flying.acamera.ACamera;
 import com.xiaopo.flying.acamera.ACameraOpener;
 import com.xiaopo.flying.acamera.model.CameraId;
+import com.xiaopo.flying.acamera.model.Photo;
 import com.xiaopo.flying.acamera.util.AndroidServices;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.PermissionNo;
 import com.yanzhenjie.permission.PermissionYes;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener, TouchableTextureView.OnTapListener {
 
@@ -38,18 +47,19 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   private Button btnTake;
 
   private ACamera camera;
+  private ImageView ivPhoto;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    textureView = findViewById(R.id.preview_content);
-    btnTake = findViewById(R.id.btn_take);
+    initView();
+
     btnTake.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        camera.takePicture();
+        takePicture();
       }
     });
 
@@ -65,6 +75,58 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     cameraManager = AndroidServices.instance().provideCameraManager();
 
     textureView.setOnTapListener(this);
+
+  }
+
+  private void takePicture() {
+    camera.takePicture()
+        .subscribeOn(Schedulers.io())
+        .map(new Function<Photo, Bitmap>() {
+          @Override
+          public Bitmap apply(final Photo photo) throws Exception {
+            byte[] bytes = photo.getBytes();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 4;
+
+            ExifInterface exifInterface = new ExifInterface(new ByteArrayInputStream(bytes));
+
+            int rotation = 0;
+            int orientation = exifInterface.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+              case ExifInterface.ORIENTATION_ROTATE_90:
+                rotation = 90;
+                break;
+              case ExifInterface.ORIENTATION_ROTATE_180:
+                rotation = 180;
+                break;
+              case ExifInterface.ORIENTATION_ROTATE_270:
+                rotation = 270;
+                break;
+            }
+
+            final int imageRotation = rotation;
+
+            ivPhoto.post(new Runnable() {
+              @Override
+              public void run() {
+                Log.d(TAG, "run: imageRotation -> " + imageRotation);
+                ivPhoto.setRotation(imageRotation);
+              }
+            });
+
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+          }
+        })
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Consumer<Bitmap>() {
+          @Override
+          public void accept(Bitmap photo) throws Exception {
+
+            ivPhoto.setImageBitmap(photo);
+          }
+        });
   }
 
 
@@ -166,5 +228,11 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     if (camera != null) {
       camera.triggerFocusAt(x, y);
     }
+  }
+
+  private void initView() {
+    textureView = findViewById(R.id.preview_content);
+    btnTake = findViewById(R.id.btn_take);
+    ivPhoto = findViewById(R.id.iv_photo);
   }
 }

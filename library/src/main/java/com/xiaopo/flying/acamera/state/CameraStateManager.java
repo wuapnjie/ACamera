@@ -15,6 +15,7 @@ import com.xiaopo.flying.acamera.focus.ZoomedCropRegionSupplier;
 import com.xiaopo.flying.acamera.model.FaceDetectMode;
 import com.xiaopo.flying.acamera.model.FlashMode;
 import com.xiaopo.flying.acamera.model.FocusMode;
+import com.xiaopo.flying.acamera.util.OrientationUtil;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,8 +34,9 @@ public class CameraStateManager {
   private final Supplier<Rect> zoomedCropRegion;
   private final Supplier<MeteringRectangle[]> aeRegionSupplier;
   private final Supplier<MeteringRectangle[]> afRegionSupplier;
+  private final Supplier<Integer> imageRotationSupplier;
 
-  public CameraStateManager(ACameraCharacteristics characteristics) {
+  public CameraStateManager(final ACameraCharacteristics characteristics) {
     focusModeState = new CameraState<>(FocusMode.CONTINUOUS_PICTURE);
     flashModeState = new CameraState<>(FlashMode.AUTO);
     faceDetectModeState = new CameraState<>(FaceDetectMode.SIMPLE);
@@ -51,6 +53,13 @@ public class CameraStateManager {
     zoomedCropRegion = new ZoomedCropRegionSupplier(characteristics.getSensorInfoActiveArraySize(), zoomState);
     aeRegionSupplier = new AEMeteringRegionSupplier(meteringState, zoomedCropRegion);
     afRegionSupplier = new AFMeteringRegionSupplier(meteringState, zoomedCropRegion);
+
+    imageRotationSupplier = new Supplier<Integer>() {
+      @Override
+      public Integer get() {
+        return OrientationUtil.calculateImageRotation(characteristics);
+      }
+    };
   }
 
   public CameraState<FaceDetectMode> getFaceDetectModeState() {
@@ -87,5 +96,9 @@ public class CameraStateManager {
 
   public Supplier<MeteringRectangle[]> getAfRegionSupplier() {
     return afRegionSupplier;
+  }
+
+  public Supplier<Integer> getImageRotationSupplier() {
+    return imageRotationSupplier;
   }
 }

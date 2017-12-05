@@ -6,10 +6,13 @@ import android.view.Surface;
 import com.xiaopo.flying.acamera.base.Lifetime;
 import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.focus.AutoFocusTrigger;
+import com.xiaopo.flying.acamera.model.Photo;
 import com.xiaopo.flying.acamera.picturetaker.PictureTaker;
 import com.xiaopo.flying.acamera.preview.Camera2PreviewSizeSelector;
 import com.xiaopo.flying.acamera.preview.PreviewSizeSelector;
 import com.xiaopo.flying.acamera.preview.PreviewStarter;
+
+import io.reactivex.Single;
 
 /**
  * @author wupanjie
@@ -65,8 +68,8 @@ class ARealCamera implements ACamera {
   }
 
   @Override
-  public void takePicture() {
-    pictureTaker.takePicture();
+  public Single<Photo> takePicture() {
+    return pictureTaker.takePicture();
   }
 
   @Override

@@ -27,6 +27,7 @@ import android.util.Log;
 import android.util.Size;
 
 import com.xiaopo.flying.acamera.model.FaceDetectMode;
+import com.xiaopo.flying.acamera.model.LensFacing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,4 +129,8 @@ public class ARealCameraCharacteristics
     return cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
   }
 
+  @Override
+  public LensFacing getLensFacing() {
+    return LensFacing.of(cameraCharacteristics.get(CameraCharacteristics.LENS_FACING));
+  }
 }

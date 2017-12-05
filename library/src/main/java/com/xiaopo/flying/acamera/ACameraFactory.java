@@ -30,6 +30,8 @@ import com.xiaopo.flying.acamera.preview.PreviewStarter;
 import com.xiaopo.flying.acamera.request.RequestFactory;
 import com.xiaopo.flying.acamera.result.CaptureListener;
 import com.xiaopo.flying.acamera.state.CameraStateManager;
+import com.xiaopo.flying.acamera.util.AndroidServices;
+import com.xiaopo.flying.acamera.util.OrientationUtil;
 
 import java.util.Arrays;
 

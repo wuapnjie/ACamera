@@ -42,16 +42,21 @@ public class RequestFactory {
     return null;
   }
 
-  public RequestTemplate.Builder createPreviewTemplate() {
-
-    return create(CameraDevice.TEMPLATE_PREVIEW)
+  private RequestTemplate.Builder createTemplate(int templateType){
+    return create(templateType)
         .withFocusModeSupplier(cameraStateManager.getFocusModeState())
         .withFaceDetectModeSupplier(cameraStateManager.getFaceDetectModeState())
         .withFlashModeSupplier(cameraStateManager.getFlashModeState())
         .withCropRegionModeSupplier(cameraStateManager.getZoomedCropRegion())
         .withAeRegionsSupplier(cameraStateManager.getAeRegionSupplier())
         .withAfRegionsSupplier(cameraStateManager.getAfRegionSupplier())
+        .withImageRotationSupplier(cameraStateManager.getImageRotationSupplier())
         .addSurface(previewSurfaceSubject.getValue());
+  }
+
+  public RequestTemplate.Builder createPreviewTemplate() {
+
+    return createTemplate(CameraDevice.TEMPLATE_PREVIEW);
   }
 
   public RequestTemplate.Builder createAFIdleTemplate() {
@@ -80,13 +85,6 @@ public class RequestFactory {
 
   public RequestTemplate.Builder createCaptureTemplate() {
 
-    return create(CameraDevice.TEMPLATE_STILL_CAPTURE)
-        .withFocusModeSupplier(cameraStateManager.getFocusModeState())
-        .withFaceDetectModeSupplier(cameraStateManager.getFaceDetectModeState())
-        .withFlashModeSupplier(cameraStateManager.getFlashModeState())
-        .withCropRegionModeSupplier(cameraStateManager.getZoomedCropRegion())
-        .withAeRegionsSupplier(cameraStateManager.getAeRegionSupplier())
-        .withAfRegionsSupplier(cameraStateManager.getAfRegionSupplier())
-        .addSurface(previewSurfaceSubject.getValue());
+    return createTemplate(CameraDevice.TEMPLATE_STILL_CAPTURE);
   }
 }
