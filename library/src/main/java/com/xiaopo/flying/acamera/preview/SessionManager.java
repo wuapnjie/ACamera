@@ -1,10 +1,10 @@
 package com.xiaopo.flying.acamera.preview;
 
 import android.hardware.camera2.CameraCaptureSession;
+import android.util.Log;
 
+import com.xiaopo.flying.acamera.base.Consumer;
 import com.xiaopo.flying.acamera.base.SafeCloseable;
-import com.xiaopo.flying.acamera.base.Supplier;
-import com.xiaopo.flying.acamera.base.optional.Optional;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -12,8 +12,8 @@ import io.reactivex.subjects.BehaviorSubject;
 /**
  * @author wupanjie
  */
-public class SessionManager implements SafeCloseable, Supplier<Optional<CameraCaptureSession>> {
-
+public class SessionManager implements SafeCloseable {
+  private static final String TAG = "SessionManager";
   private final BehaviorSubject<CameraCaptureSession> subject;
 
   private SessionManager() {
@@ -48,10 +48,14 @@ public class SessionManager implements SafeCloseable, Supplier<Optional<CameraCa
   @Override
   public void close() {
     subject.onComplete();
+    instance = null;
   }
 
-  @Override
-  public Optional<CameraCaptureSession> get() {
-    return Optional.fromNullable(subject.getValue());
+  public void withSession(Consumer<CameraCaptureSession> consumer) {
+    if (subject.hasValue()) {
+      consumer.accept(subject.getValue());
+    } else {
+      Log.e(TAG, "withSession: there is no session now.");
+    }
   }
 }

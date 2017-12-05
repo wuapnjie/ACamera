@@ -28,8 +28,7 @@ public class PreviewCommand extends CameraCommand implements Consumer<CameraCapt
   @Override
   public void run() {
     SessionManager.getInstance()
-        .get()
-        .ifPresent(this);
+        .withSession(this);
   }
 
   @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")

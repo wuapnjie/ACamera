@@ -38,8 +38,7 @@ public class CaptureCommand extends CameraCommand<Photo> implements Consumer<Cam
   @Override
   public void run() {
     SessionManager.getInstance()
-        .get()
-        .ifPresent(this);
+        .withSession(this);
   }
 
   @Override

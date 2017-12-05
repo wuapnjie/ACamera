@@ -6,8 +6,6 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.support.annotation.NonNull;
 
-import com.xiaopo.flying.acamera.base.optional.Preconditions;
-
 final class PointMeteringParameters implements MeteringParameters {
   private final PointF mAFPoint;
   private final PointF mAEPoint;
@@ -39,10 +37,6 @@ final class PointMeteringParameters implements MeteringParameters {
   @NonNull
   public static PointMeteringParameters createForNormalizedCoordinates(PointF afPoint,
                                                                        PointF aePoint, int sensorOrientation, Settings3A settings3A) {
-    Preconditions.checkArgument(sensorOrientation % 90 == 0,
-        "sensorOrientation must be a " + "multiple of 90");
-    Preconditions.checkArgument(sensorOrientation >= 0,
-        "sensorOrientation must not be " + "negative");
     sensorOrientation %= 360;
 
     return new PointMeteringParameters(afPoint, aePoint, sensorOrientation, settings3A);

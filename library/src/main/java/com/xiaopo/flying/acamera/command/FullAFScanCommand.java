@@ -27,8 +27,7 @@ public class FullAFScanCommand extends CameraCommand implements Consumer<CameraC
   @Override
   public void run() {
     SessionManager.getInstance()
-        .get()
-        .ifPresent(this);
+        .withSession(this);
   }
 
   @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
