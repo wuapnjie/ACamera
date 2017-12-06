@@ -51,6 +51,8 @@ public class RequestFactory {
         .withAeRegionsSupplier(cameraStateManager.getAeRegionSupplier())
         .withAfRegionsSupplier(cameraStateManager.getAfRegionSupplier())
         .withImageRotationSupplier(cameraStateManager.getImageRotationSupplier())
+        .withJpegQualitySupplier(cameraStateManager.getJpegQualityState())
+        .withAeExposureCompensationSupplier(cameraStateManager.getAeExposureCompensationState())
         .addSurface(previewSurfaceSubject.getValue());
   }
 

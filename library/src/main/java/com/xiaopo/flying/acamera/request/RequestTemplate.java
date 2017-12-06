@@ -31,6 +31,8 @@ public class RequestTemplate {
   private final Supplier<MeteringRectangle[]> aeRegionsSupplier;
   private final Supplier<MeteringRectangle[]> afRegionsSupplier;
   private final Supplier<Integer> imageRotationSupplier;
+  private final Supplier<Integer> aeExposureCompensationSupplier;
+  private final Supplier<Byte> jpegQualitySupplier;
   private final HashSet<Surface> surfaces;
   private final HashMap<CaptureRequest.Key, ?> params;
   private final CaptureListener captureListener;
@@ -45,6 +47,8 @@ public class RequestTemplate {
     this.aeRegionsSupplier = builder.aeRegionsSupplier;
     this.afRegionsSupplier = builder.afRegionsSupplier;
     this.imageRotationSupplier = builder.imageRotationSupplier;
+    this.aeExposureCompensationSupplier = builder.aeExposureCompensationSupplier;
+    this.jpegQualitySupplier = builder.jpegQualitySupplier;
     this.surfaces = builder.surfaces;
     this.params = builder.params;
     this.captureListener = builder.captureListener;
@@ -112,16 +116,24 @@ public class RequestTemplate {
       requestBuilder.set(CaptureRequest.JPEG_ORIENTATION,
           imageRotationSupplier.get());
     }
+    if (aeExposureCompensationSupplier != null) {
+      Integer value = aeExposureCompensationSupplier.get();
+      if (value != 0) {
+        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, true);
+      }
+      requestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION,
+          value);
+    }
+    if (jpegQualitySupplier != null) {
+      requestBuilder.set(CaptureRequest.JPEG_QUALITY,
+          jpegQualitySupplier.get());
+    }
 
     // TODO to be supplier
-    requestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, 0);
     requestBuilder.set(CaptureRequest.CONTROL_MODE,
         CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
     requestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,
         CaptureRequest.CONTROL_SCENE_MODE_FACE_PRIORITY);
-    requestBuilder.set(CaptureRequest.JPEG_QUALITY,
-        (byte) 90);
-
 
     for (CaptureRequest.Key key : params.keySet()) {
       requestBuilder.set(key, params.get(key));
@@ -141,6 +153,8 @@ public class RequestTemplate {
     private Supplier<MeteringRectangle[]> aeRegionsSupplier;
     private Supplier<MeteringRectangle[]> afRegionsSupplier;
     private Supplier<Integer> imageRotationSupplier;
+    private Supplier<Integer> aeExposureCompensationSupplier;
+    private Supplier<Byte> jpegQualitySupplier;
     private HashSet<Surface> surfaces = new HashSet<>();
     private HashMap<CaptureRequest.Key, Object> params = new HashMap<>();
     private CompositeCaptureListener captureListener = new CompositeCaptureListener();
@@ -189,6 +203,16 @@ public class RequestTemplate {
 
     public Builder withImageRotationSupplier(Supplier<Integer> imageRotationSupplier) {
       this.imageRotationSupplier = imageRotationSupplier;
+      return this;
+    }
+
+    public Builder withAeExposureCompensationSupplier(Supplier<Integer> aeExposureCompensationSupplier) {
+      this.aeExposureCompensationSupplier = aeExposureCompensationSupplier;
+      return this;
+    }
+
+    public Builder withJpegQualitySupplier(Supplier<Byte> jpegQualitySupplier) {
+      this.jpegQualitySupplier = jpegQualitySupplier;
       return this;
     }
 

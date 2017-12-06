@@ -5,6 +5,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.os.Handler;
+import android.util.Size;
 import android.view.Surface;
 
 import com.xiaopo.flying.acamera.base.Consumer;
@@ -18,22 +19,26 @@ import com.xiaopo.flying.acamera.command.CameraCommandCenter;
 import com.xiaopo.flying.acamera.command.CameraCommandExecutor;
 import com.xiaopo.flying.acamera.command.CameraCommandFactory;
 import com.xiaopo.flying.acamera.command.CameraCommandType;
-import com.xiaopo.flying.acamera.command.CaptureCommand;
-import com.xiaopo.flying.acamera.command.FullAFScanCommand;
-import com.xiaopo.flying.acamera.command.PreviewCommand;
+import com.xiaopo.flying.acamera.command.impl.CaptureCommand;
+import com.xiaopo.flying.acamera.command.impl.FullAFScanCommand;
+import com.xiaopo.flying.acamera.command.impl.PreviewCommand;
 import com.xiaopo.flying.acamera.focus.AutoFocusStateListener;
 import com.xiaopo.flying.acamera.focus.AutoFocusTrigger;
+import com.xiaopo.flying.acamera.focus.MeteringParameters;
+import com.xiaopo.flying.acamera.model.FaceDetectMode;
+import com.xiaopo.flying.acamera.model.FlashMode;
+import com.xiaopo.flying.acamera.model.FocusMode;
 import com.xiaopo.flying.acamera.picturetaker.PictureTaker;
 import com.xiaopo.flying.acamera.picturetaker.StillSurfaceReader;
 import com.xiaopo.flying.acamera.preview.CaptureSessionCreator;
 import com.xiaopo.flying.acamera.preview.PreviewStarter;
+import com.xiaopo.flying.acamera.preview.SessionManager;
 import com.xiaopo.flying.acamera.request.RequestFactory;
 import com.xiaopo.flying.acamera.result.CaptureListener;
 import com.xiaopo.flying.acamera.state.CameraStateManager;
-import com.xiaopo.flying.acamera.util.AndroidServices;
-import com.xiaopo.flying.acamera.util.OrientationUtil;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.subjects.BehaviorSubject;
 
@@ -75,6 +80,8 @@ class ACameraFactory {
       previewSurfaceSubject = BehaviorSubject.create();
       stillSurfaceReader = new StillSurfaceReader(cameraHandler, cameraStateManager);
 
+      lifetime.add(SessionManager.getInstance());
+
       initRequestFactory();
 
       initCommandSystem();
@@ -85,17 +92,80 @@ class ACameraFactory {
 
       initPictureTaker();
 
+      registryStateObserver();
+
       return new ARealCamera(
           lifetime,
           aCameraCharacteristics,
           previewStarter,
           focusTrigger,
-          pictureTaker);
+          pictureTaker,
+          cameraStateManager);
     } catch (CameraAccessException e) {
       e.printStackTrace();
     }
 
     return null;
+  }
+
+  private void registryStateObserver() {
+    cameraStateManager.getZoomState()
+        .registryStateObserver(new io.reactivex.functions.Consumer<Float>() {
+          @Override
+          public void accept(Float zoom) throws Exception {
+            CameraCommandCenter.getInstance()
+                .nextCommand(commandFactory.create(CameraCommandType.PREVIEW));
+          }
+        });
+
+    cameraStateManager.getFocusModeState()
+        .registryStateObserver(new io.reactivex.functions.Consumer<FocusMode>() {
+          @Override
+          public void accept(FocusMode focusMode) throws Exception {
+            CameraCommandCenter.getInstance()
+                .nextCommand(commandFactory.create(CameraCommandType.PREVIEW));
+          }
+        });
+
+    cameraStateManager.getFlashModeState()
+        .registryStateObserver(new io.reactivex.functions.Consumer<FlashMode>() {
+          @Override
+          public void accept(FlashMode flashMode) throws Exception {
+            CameraCommandCenter.getInstance()
+                .nextCommand(commandFactory.create(CameraCommandType.PREVIEW));
+          }
+        });
+
+    cameraStateManager.getFaceDetectModeState()
+        .registryStateObserver(new io.reactivex.functions.Consumer<FaceDetectMode>() {
+          @Override
+          public void accept(FaceDetectMode faceDetectMode) throws Exception {
+            CameraCommandCenter.getInstance()
+                .nextCommand(commandFactory.create(CameraCommandType.PREVIEW));
+          }
+        });
+
+    cameraStateManager.getMeteringState()
+        .registryStateObserver(new io.reactivex.functions.Consumer<MeteringParameters>() {
+          @Override
+          public void accept(MeteringParameters parameters) throws Exception {
+            CameraCommand focusCommand = commandFactory.create(CameraCommandType.SCAN_FOCUS);
+            CameraCommandCenter.getInstance().nextCommand(focusCommand);
+
+            CameraCommand previewCommand = commandFactory.create(CameraCommandType.PREVIEW);
+            CameraCommandCenter.getInstance().nextCommand(previewCommand, 3, TimeUnit.SECONDS);
+          }
+        });
+
+    cameraStateManager.getPictureSizeState()
+        .registryStateObserver(new io.reactivex.functions.Consumer<Size>() {
+          @Override
+          public void accept(Size size) throws Exception {
+            CameraCommandCenter.getInstance()
+                .nextCommand(commandFactory.create(CameraCommandType.PREVIEW));
+          }
+        });
+
   }
 
   private void initPictureTaker() {
@@ -104,7 +174,6 @@ class ACameraFactory {
 
   private void initFocusTrigger() {
     focusTrigger = new AutoFocusTrigger(
-        commandFactory,
         cameraStateManager,
         aCameraCharacteristics.getSensorOrientation()
     );
@@ -166,6 +235,8 @@ class ACameraFactory {
         });
       }
     });
+
+    lifetime.add(commandCenter);
   }
 
   class SafeCloseableHolder<T extends AutoCloseable> implements SafeCloseable {

@@ -3,7 +3,6 @@ package com.xiaopo.flying.acamera.util;
 import android.view.Surface;
 
 import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
-import com.xiaopo.flying.acamera.characterisitics.ARealCameraCharacteristics;
 import com.xiaopo.flying.acamera.model.LensFacing;
 
 /**

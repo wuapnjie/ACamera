@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.util.Size;
 
+import com.xiaopo.flying.acamera.base.SafeCloseable;
 import com.xiaopo.flying.acamera.base.Supplier;
 import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.focus.AEMeteringRegionSupplier;
@@ -23,13 +24,15 @@ import java.util.Comparator;
 /**
  * @author wupanjie
  */
-public class CameraStateManager {
+public class CameraStateManager implements SafeCloseable{
   private final CameraState<FocusMode> focusModeState;
   private final CameraState<FlashMode> flashModeState;
   private final CameraState<FaceDetectMode> faceDetectModeState;
   private final CameraState<Float> zoomState;
   private final CameraState<MeteringParameters> meteringState;
   private final CameraState<Size> pictureSizeState;
+  private final CameraState<Byte> jpegQualityState;
+  private final CameraState<Integer> aeExposureCompensationState;
 
   private final Supplier<Rect> zoomedCropRegion;
   private final Supplier<MeteringRectangle[]> aeRegionSupplier;
@@ -49,6 +52,8 @@ public class CameraStateManager {
             (long) rhs.getWidth() * rhs.getHeight());
       }
     }));
+    jpegQualityState = new CameraState<>((byte)90);
+    aeExposureCompensationState = new CameraState<>(0);
 
     zoomedCropRegion = new ZoomedCropRegionSupplier(characteristics.getSensorInfoActiveArraySize(), zoomState);
     aeRegionSupplier = new AEMeteringRegionSupplier(meteringState, zoomedCropRegion);
@@ -86,6 +91,14 @@ public class CameraStateManager {
     return pictureSizeState;
   }
 
+  public CameraState<Byte> getJpegQualityState() {
+    return jpegQualityState;
+  }
+
+  public CameraState<Integer> getAeExposureCompensationState() {
+    return aeExposureCompensationState;
+  }
+
   public Supplier<Rect> getZoomedCropRegion() {
     return zoomedCropRegion;
   }
@@ -100,5 +113,15 @@ public class CameraStateManager {
 
   public Supplier<Integer> getImageRotationSupplier() {
     return imageRotationSupplier;
+  }
+
+  @Override
+  public void close() {
+    focusModeState.close();
+    flashModeState.close();
+    faceDetectModeState.close();
+    zoomState.close();
+    pictureSizeState.close();
+    meteringState.close();
   }
 }

@@ -41,11 +41,11 @@ public abstract class CameraCommand<T> implements Command {
   }
 
   @SuppressWarnings("unchecked")
-  SingleSubject<T> getDeferredResult() {
+  protected SingleSubject<T> getDeferredResult() {
     return (SingleSubject<T>) deferredResult;
   }
 
-  public void setDeferredResult(SingleSubject deferredResult) {
+  public void setDeferredResult(SingleSubject<?> deferredResult) {
     this.deferredResult = deferredResult;
   }
 }

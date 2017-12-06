@@ -61,7 +61,7 @@ class ARealCamera2Opener extends ACameraOpener implements SingleOnSubscribe<ACam
       @Override
       public void onError(@NonNull CameraDevice camera, int error) {
         if (isFirstCallback) {
-          emitter.onError(new Exception("error when open camera, code is " + error));
+          emitter.onError(new ACameraException("error when open camera, code is " + error));
         }
       }
     }, cameraHandler);

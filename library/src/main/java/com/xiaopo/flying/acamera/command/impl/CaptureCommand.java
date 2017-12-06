@@ -1,4 +1,4 @@
-package com.xiaopo.flying.acamera.command;
+package com.xiaopo.flying.acamera.command.impl;
 
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.xiaopo.flying.acamera.base.Consumer;
-import com.xiaopo.flying.acamera.base.Supplier;
+import com.xiaopo.flying.acamera.command.CameraCommand;
 import com.xiaopo.flying.acamera.model.Photo;
 import com.xiaopo.flying.acamera.picturetaker.StillSurfaceReader;
 import com.xiaopo.flying.acamera.preview.SessionManager;

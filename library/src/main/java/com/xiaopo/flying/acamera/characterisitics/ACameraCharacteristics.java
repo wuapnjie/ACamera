@@ -56,4 +56,6 @@ public interface ACameraCharacteristics {
 
   LensFacing getLensFacing();
 
+  float getMaxZoomRatio();
+
 }

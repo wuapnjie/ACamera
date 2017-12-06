@@ -19,6 +19,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import com.xiaopo.flying.acamera.ACamera;
 import com.xiaopo.flying.acamera.ACameraOpener;
@@ -42,12 +43,13 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   private static final String TAG = "MainActivity";
   private Handler cameraHandler;
   private CameraManager cameraManager;
-  private TouchableTextureView textureView;
   private SurfaceTexture surfaceTexture;
   private Button btnTake;
 
   private ACamera camera;
   private ImageView ivPhoto;
+  private TouchableTextureView previewContent;
+  private SeekBar seekBar;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
         takePicture();
       }
     });
-
+    seekBar.setEnabled(false);
     AndPermission.with(this)
         .permission(Manifest.permission.CAMERA)
         .requestCode(300)
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     cameraHandler = new Handler(thread.getLooper());
     cameraManager = AndroidServices.instance().provideCameraManager();
 
-    textureView.setOnTapListener(this);
+    previewContent.setOnTapListener(this);
 
   }
 
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   @PermissionYes(300)
   private void getPermissionYes(List<String> grantedPermissions) {
     if (surfaceTexture == null) {
-      textureView.setSurfaceTextureListener(this);
+      previewContent.setSurfaceTextureListener(this);
     } else {
       openCamera();
     }
@@ -176,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     this.surfaceTexture = surface;
     Matrix matrix = new Matrix();
     matrix.setValues(new float[]{1, 0, 0, 0, 1, 0, 0, 0, 1});
-    textureView.setTransform(matrix);
+    previewContent.setTransform(matrix);
     openCamera();
   }
 
@@ -186,15 +188,38 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     ACameraOpener
         .with(cameraId, cameraHandler)
         .open()
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Consumer<ACamera>() {
           @Override
-          public void accept(ACamera aCamera) throws Exception {
+          public void accept(final ACamera aCamera) throws Exception {
             Log.d(TAG, "accept: aCamera");
             camera = aCamera;
-            ;
+
+            seekBar.setEnabled(true);
+
+            final float min = 1f;
+            final float max = aCamera.getCharacteristic().getMaxZoomRatio();
+
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+              @Override
+              public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                float ratio = min + progress * ((max - min) / 100);
+                aCamera.getStateManager().getZoomState().update(ratio);
+              }
+
+              @Override
+              public void onStartTrackingTouch(SeekBar seekBar) {
+
+              }
+
+              @Override
+              public void onStopTrackingTouch(SeekBar seekBar) {
+
+              }
+            });
 
             surfaceTexture.setDefaultBufferSize(1280, 960);
-
             aCamera.startPreview(new Surface(surfaceTexture));
           }
         });
@@ -231,8 +256,10 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   }
 
   private void initView() {
-    textureView = findViewById(R.id.preview_content);
+    previewContent = findViewById(R.id.preview_content);
     btnTake = findViewById(R.id.btn_take);
     ivPhoto = findViewById(R.id.iv_photo);
+    previewContent = findViewById(R.id.preview_content);
+    seekBar = findViewById(R.id.seek_bar);
   }
 }

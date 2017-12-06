@@ -1,5 +1,7 @@
 package com.xiaopo.flying.acamera.command;
 
+import com.xiaopo.flying.acamera.base.SafeCloseable;
+
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.subjects.PublishSubject;
@@ -7,7 +9,7 @@ import io.reactivex.subjects.PublishSubject;
 /**
  * @author wupanjie
  */
-public class CameraCommandCenter implements AutoCloseable{
+public class CameraCommandCenter implements SafeCloseable{
   private final PublishSubject<CameraCommand> commandSubject;
   private static CameraCommandCenter instance;
 
@@ -44,7 +46,7 @@ public class CameraCommandCenter implements AutoCloseable{
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     commandSubject.onComplete();
     instance = null;
   }

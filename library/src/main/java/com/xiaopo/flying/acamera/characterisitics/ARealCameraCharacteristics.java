@@ -32,6 +32,13 @@ import com.xiaopo.flying.acamera.model.LensFacing;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.hardware.camera2.CameraCharacteristics.LENS_FACING;
+import static android.hardware.camera2.CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM;
+import static android.hardware.camera2.CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP;
+import static android.hardware.camera2.CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE;
+import static android.hardware.camera2.CameraCharacteristics.SENSOR_ORIENTATION;
+import static android.hardware.camera2.CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES;
+
 /**
  * Describes a OneCamera device which is on top of camera2 API. This is
  * essential a wrapper for #{link
@@ -53,7 +60,7 @@ public class ARealCameraCharacteristics
   public List<Size> getSupportedPictureSizes(int imageFormat) {
     StreamConfigurationMap configMap;
     try {
-      configMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+      configMap = cameraCharacteristics.get(SCALER_STREAM_CONFIGURATION_MAP);
     } catch (Exception ex) {
       Log.e(TAG, "Unable to obtain picture sizes.", ex);
       // See b/19623115   where java.lang.AssertionError can be thrown due to HAL error
@@ -75,7 +82,7 @@ public class ARealCameraCharacteristics
   public List<Size> getSupportedPreviewSizes() {
     StreamConfigurationMap configMap;
     try {
-      configMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+      configMap = cameraCharacteristics.get(SCALER_STREAM_CONFIGURATION_MAP);
     } catch (Exception ex) {
       Log.e(TAG, "Unable to obtain preview sizes.", ex);
       // See b/19623115   where java.lang.AssertionError can be thrown due to HAL error
@@ -96,7 +103,7 @@ public class ARealCameraCharacteristics
   @Override
   public List<FaceDetectMode> getSupportedFaceDetectModes() {
     int[] modes = cameraCharacteristics.get(
-        CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES);
+        STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES);
 
     if (modes == null) {
       return new ArrayList<>(0);
@@ -121,16 +128,21 @@ public class ARealCameraCharacteristics
 
   @Override
   public Rect getSensorInfoActiveArraySize() {
-    return cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+    return cameraCharacteristics.get(SENSOR_INFO_ACTIVE_ARRAY_SIZE);
   }
 
   @Override
   public int getSensorOrientation() {
-    return cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+    return cameraCharacteristics.get(SENSOR_ORIENTATION);
   }
 
   @Override
   public LensFacing getLensFacing() {
-    return LensFacing.of(cameraCharacteristics.get(CameraCharacteristics.LENS_FACING));
+    return LensFacing.of(cameraCharacteristics.get(LENS_FACING));
+  }
+
+  @Override
+  public float getMaxZoomRatio() {
+    return cameraCharacteristics.get(SCALER_AVAILABLE_MAX_DIGITAL_ZOOM);
   }
 }
