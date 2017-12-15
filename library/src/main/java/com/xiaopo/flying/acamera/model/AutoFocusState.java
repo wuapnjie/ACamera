@@ -5,7 +5,7 @@ import android.hardware.camera2.CaptureResult;
 /**
  * @author wupanjie
  */
-public enum FocusState {
+public enum AutoFocusState {
   /**
    * Indicates AF system is inactive for some reason (could be an error).
    */
@@ -35,7 +35,7 @@ public enum FocusState {
    */
   PASSIVE_UNFOCUSED;
 
-  public static FocusState from(int stateConstant) {
+  public static AutoFocusState from(int stateConstant) {
     switch (stateConstant) {
       case CaptureResult.CONTROL_AF_STATE_ACTIVE_SCAN:
         return ACTIVE_SCAN;

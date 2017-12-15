@@ -81,7 +81,9 @@ public class PreviewStarter implements SafeCloseable {
 
   @Override
   public void close() {
-    currentPreviewSession.close();
+    if (currentPreviewSession!= null) {
+      currentPreviewSession.close();
+    }
     previewSurfaceSubject.onComplete();
   }
 }

@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  *
  * @author wupanjie
  */
-public enum FocusMode {
+public enum AutoFocusMode {
   FIXED(CameraMetadata.CONTROL_AF_MODE_OFF),
   AUTO(CameraMetadata.CONTROL_AF_MODE_AUTO),
   CONTINUOUS_PICTURE(CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE),
@@ -22,11 +22,11 @@ public enum FocusMode {
 
   public final int cameraFocusConstant;
 
-  FocusMode(int cameraFocusConstant) {
+  AutoFocusMode(int cameraFocusConstant) {
     this.cameraFocusConstant = cameraFocusConstant;
   }
 
-  public static FocusMode of(@CameraFocusConstant int cameraFocusConstant) {
+  public static AutoFocusMode of(@CameraFocusConstant int cameraFocusConstant) {
     switch (cameraFocusConstant) {
       case CameraMetadata.CONTROL_AF_MODE_AUTO:
         return AUTO;

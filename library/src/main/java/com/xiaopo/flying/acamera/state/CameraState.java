@@ -23,7 +23,7 @@ public class CameraState<T> implements Supplier<T>, Updatable<T>, SafeCloseable 
 
   @Override
   public void update(T newValue) {
-    if (newValue == stateSubject.getValue()) return;
+    if (newValue == stateSubject.getValue() || stateSubject.hasComplete()) return;
     stateSubject.onNext(newValue);
   }
 

@@ -6,12 +6,15 @@ import android.view.Surface;
 import com.xiaopo.flying.acamera.base.SafeCloseable;
 import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.focus.FocusFunction;
+import com.xiaopo.flying.acamera.model.AutoFocusState;
 import com.xiaopo.flying.acamera.model.Photo;
 import com.xiaopo.flying.acamera.picturetaker.PictureTakeFunction;
 import com.xiaopo.flying.acamera.preview.PreviewSizeSelector;
 import com.xiaopo.flying.acamera.state.CameraStateManager;
 
+import io.reactivex.Observer;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 
 /**
  * @author wupanjie
@@ -35,6 +38,8 @@ public interface ACamera extends
   Single<Photo> takePicture();
 
   CameraStateManager getStateManager();
+
+  void observeAFState(Observer<AutoFocusState> observer);
 
   void close();
 }

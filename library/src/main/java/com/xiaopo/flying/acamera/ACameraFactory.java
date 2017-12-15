@@ -25,9 +25,10 @@ import com.xiaopo.flying.acamera.command.impl.PreviewCommand;
 import com.xiaopo.flying.acamera.focus.AutoFocusStateListener;
 import com.xiaopo.flying.acamera.focus.AutoFocusTrigger;
 import com.xiaopo.flying.acamera.focus.MeteringParameters;
+import com.xiaopo.flying.acamera.model.AutoFocusMode;
+import com.xiaopo.flying.acamera.model.AutoFocusState;
 import com.xiaopo.flying.acamera.model.FaceDetectMode;
 import com.xiaopo.flying.acamera.model.FlashMode;
-import com.xiaopo.flying.acamera.model.FocusMode;
 import com.xiaopo.flying.acamera.picturetaker.PictureTaker;
 import com.xiaopo.flying.acamera.picturetaker.StillSurfaceReader;
 import com.xiaopo.flying.acamera.preview.CaptureSessionCreator;
@@ -41,6 +42,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * @author wupanjie
@@ -63,6 +65,7 @@ class ACameraFactory {
   private CaptureListener defaultListener;
   private StillSurfaceReader stillSurfaceReader;
   private PictureTaker pictureTaker;
+  private PublishSubject<AutoFocusState> afStateSubject;
 
   ACameraFactory(CameraManager cameraManager, Handler cameraHandler, CameraDevice cameraDevice) {
     this.cameraManager = cameraManager;
@@ -79,6 +82,7 @@ class ACameraFactory {
       cameraStateManager = new CameraStateManager(aCameraCharacteristics);
       previewSurfaceSubject = BehaviorSubject.create();
       stillSurfaceReader = new StillSurfaceReader(cameraHandler, cameraStateManager);
+      afStateSubject = PublishSubject.create();
 
       lifetime.add(SessionManager.getInstance());
 
@@ -99,6 +103,7 @@ class ACameraFactory {
           aCameraCharacteristics,
           previewStarter,
           focusTrigger,
+          afStateSubject,
           pictureTaker,
           cameraStateManager);
     } catch (CameraAccessException e) {
@@ -119,9 +124,9 @@ class ACameraFactory {
         });
 
     cameraStateManager.getFocusModeState()
-        .registryStateObserver(new io.reactivex.functions.Consumer<FocusMode>() {
+        .registryStateObserver(new io.reactivex.functions.Consumer<AutoFocusMode>() {
           @Override
-          public void accept(FocusMode focusMode) throws Exception {
+          public void accept(AutoFocusMode focusMode) throws Exception {
             CameraCommandCenter.getInstance()
                 .nextCommand(commandFactory.create(CameraCommandType.PREVIEW));
           }
@@ -195,7 +200,7 @@ class ACameraFactory {
 
   private void initRequestFactory() {
 
-    defaultListener = new AutoFocusStateListener();
+    defaultListener = new AutoFocusStateListener(afStateSubject);
     requestFactory =
         new RequestFactory(cameraDevice,
             cameraStateManager,

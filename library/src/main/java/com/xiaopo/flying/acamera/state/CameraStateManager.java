@@ -15,7 +15,7 @@ import com.xiaopo.flying.acamera.focus.MeteringParameters;
 import com.xiaopo.flying.acamera.focus.ZoomedCropRegionSupplier;
 import com.xiaopo.flying.acamera.model.FaceDetectMode;
 import com.xiaopo.flying.acamera.model.FlashMode;
-import com.xiaopo.flying.acamera.model.FocusMode;
+import com.xiaopo.flying.acamera.model.AutoFocusMode;
 import com.xiaopo.flying.acamera.util.OrientationUtil;
 
 import java.util.Collections;
@@ -25,7 +25,7 @@ import java.util.Comparator;
  * @author wupanjie
  */
 public class CameraStateManager implements SafeCloseable{
-  private final CameraState<FocusMode> focusModeState;
+  private final CameraState<AutoFocusMode> focusModeState;
   private final CameraState<FlashMode> flashModeState;
   private final CameraState<FaceDetectMode> faceDetectModeState;
   private final CameraState<Float> zoomState;
@@ -40,7 +40,7 @@ public class CameraStateManager implements SafeCloseable{
   private final Supplier<Integer> imageRotationSupplier;
 
   public CameraStateManager(final ACameraCharacteristics characteristics) {
-    focusModeState = new CameraState<>(FocusMode.CONTINUOUS_PICTURE);
+    focusModeState = new CameraState<>(AutoFocusMode.CONTINUOUS_PICTURE);
     flashModeState = new CameraState<>(FlashMode.AUTO);
     faceDetectModeState = new CameraState<>(FaceDetectMode.SIMPLE);
     zoomState = new CameraState<>(1.0f);
@@ -71,7 +71,7 @@ public class CameraStateManager implements SafeCloseable{
     return faceDetectModeState;
   }
 
-  public CameraState<FocusMode> getFocusModeState() {
+  public CameraState<AutoFocusMode> getFocusModeState() {
     return focusModeState;
   }
 
@@ -123,5 +123,7 @@ public class CameraStateManager implements SafeCloseable{
     zoomState.close();
     pictureSizeState.close();
     meteringState.close();
+    jpegQualityState.close();
+    aeExposureCompensationState.close();
   }
 }

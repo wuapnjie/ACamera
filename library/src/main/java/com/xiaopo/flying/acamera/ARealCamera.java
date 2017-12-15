@@ -6,6 +6,7 @@ import android.view.Surface;
 import com.xiaopo.flying.acamera.base.Lifetime;
 import com.xiaopo.flying.acamera.characterisitics.ACameraCharacteristics;
 import com.xiaopo.flying.acamera.focus.AutoFocusTrigger;
+import com.xiaopo.flying.acamera.model.AutoFocusState;
 import com.xiaopo.flying.acamera.model.Photo;
 import com.xiaopo.flying.acamera.picturetaker.PictureTaker;
 import com.xiaopo.flying.acamera.preview.Camera2PreviewSizeSelector;
@@ -13,7 +14,9 @@ import com.xiaopo.flying.acamera.preview.PreviewSizeSelector;
 import com.xiaopo.flying.acamera.preview.PreviewStarter;
 import com.xiaopo.flying.acamera.state.CameraStateManager;
 
+import io.reactivex.Observer;
 import io.reactivex.Single;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * @author wupanjie
@@ -25,6 +28,7 @@ class ARealCamera implements ACamera {
   private final ACameraCharacteristics characteristics;
   private final PreviewSizeSelector previewSizeSelector;
   private final AutoFocusTrigger focusTrigger;
+  private final PublishSubject<AutoFocusState> afStateSubject;
   private final PictureTaker pictureTaker;
   private final CameraStateManager stateManager;
 
@@ -36,6 +40,7 @@ class ARealCamera implements ACamera {
               ACameraCharacteristics characteristics,
               PreviewStarter previewStarter,
               AutoFocusTrigger focusTrigger,
+              PublishSubject<AutoFocusState> afStateSubject,
               PictureTaker pictureTaker,
               CameraStateManager stateManager) {
     this.lifetime = lifetime;
@@ -43,6 +48,7 @@ class ARealCamera implements ACamera {
     this.previewStarter = previewStarter;
     this.previewSizeSelector = new Camera2PreviewSizeSelector(characteristics.getSupportedPreviewSizes());
     this.focusTrigger = focusTrigger;
+    this.afStateSubject = afStateSubject;
     this.pictureTaker = pictureTaker;
     this.stateManager = stateManager;
   }
@@ -74,6 +80,11 @@ class ARealCamera implements ACamera {
   public void triggerFocusAt(float x, float y) {
     if (closed) return;
     focusTrigger.triggerFocusAt(x, y);
+  }
+
+  @Override
+  public void observeAFState(Observer<AutoFocusState> observer) {
+    afStateSubject.subscribe(observer);
   }
 
   @Override

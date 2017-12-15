@@ -36,7 +36,7 @@ public class PreviewCommand extends CameraCommand implements Consumer<CameraCapt
   @Override
   public void accept(CameraCaptureSession captureSession) {
     try {
-      captureSession.setRepeatingBurst(Arrays.asList(previewRequest.generateRequest()), null, cameraHandler);
+      captureSession.setRepeatingBurst(Arrays.asList(previewRequest.generateRequest()), previewRequest.getCaptureCallback(), cameraHandler);
     } catch (CameraAccessException e) {
       e.printStackTrace();
     }

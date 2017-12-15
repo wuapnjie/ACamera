@@ -9,7 +9,7 @@ import android.view.Surface;
 import com.xiaopo.flying.acamera.base.Supplier;
 import com.xiaopo.flying.acamera.model.FaceDetectMode;
 import com.xiaopo.flying.acamera.model.FlashMode;
-import com.xiaopo.flying.acamera.model.FocusMode;
+import com.xiaopo.flying.acamera.model.AutoFocusMode;
 import com.xiaopo.flying.acamera.result.CaptureListener;
 import com.xiaopo.flying.acamera.result.CompositeCaptureListener;
 import com.xiaopo.flying.acamera.result.ForwardCaptureCallback;
@@ -24,7 +24,7 @@ import java.util.Set;
 public class RequestTemplate {
   private final CaptureRequest.Builder requestBuilder;
 
-  private final Supplier<FocusMode> focusModeSupplier;
+  private final Supplier<AutoFocusMode> focusModeSupplier;
   private final Supplier<FlashMode> flashModeSupplier;
   private final Supplier<FaceDetectMode> faceDetectModeSupplier;
   private final Supplier<Rect> cropRegionSupplier;
@@ -58,7 +58,7 @@ public class RequestTemplate {
     return requestBuilder;
   }
 
-  public Supplier<FocusMode> getFocusModeSupplier() {
+  public Supplier<AutoFocusMode> getFocusModeSupplier() {
     return focusModeSupplier;
   }
 
@@ -146,7 +146,7 @@ public class RequestTemplate {
   public static class Builder {
     private final CaptureRequest.Builder requestBuilder;
 
-    private Supplier<FocusMode> focusModeSupplier;
+    private Supplier<AutoFocusMode> focusModeSupplier;
     private Supplier<FlashMode> flashModeSupplier;
     private Supplier<FaceDetectMode> faceDetectModeSupplier;
     private Supplier<Rect> cropRegionSupplier;
@@ -163,7 +163,7 @@ public class RequestTemplate {
       this.requestBuilder = requestBuilder;
     }
 
-    public Builder withFocusModeSupplier(Supplier<FocusMode> supplier) {
+    public Builder withFocusModeSupplier(Supplier<AutoFocusMode> supplier) {
       this.focusModeSupplier = supplier;
       return this;
     }

@@ -23,6 +23,7 @@ import android.widget.SeekBar;
 
 import com.xiaopo.flying.acamera.ACamera;
 import com.xiaopo.flying.acamera.ACameraOpener;
+import com.xiaopo.flying.acamera.model.AutoFocusState;
 import com.xiaopo.flying.acamera.model.CameraId;
 import com.xiaopo.flying.acamera.model.Photo;
 import com.xiaopo.flying.acamera.util.AndroidServices;
@@ -33,7 +34,9 @@ import com.yanzhenjie.permission.PermissionYes;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -178,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
     this.surfaceTexture = surface;
     Matrix matrix = new Matrix();
     matrix.setValues(new float[]{1, 0, 0, 0, 1, 0, 0, 0, 1});
+//    matrix.postScale(0.5f,0.5f,width/2,height/2);
     previewContent.setTransform(matrix);
     openCamera();
   }
@@ -194,6 +198,28 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
           public void accept(final ACamera aCamera) throws Exception {
             Log.d(TAG, "accept: aCamera");
             camera = aCamera;
+
+            camera.observeAFState(new Observer<AutoFocusState>() {
+              @Override
+              public void onSubscribe(Disposable d) {
+
+              }
+
+              @Override
+              public void onNext(AutoFocusState autoFocusState) {
+                Log.d(TAG, "onNext: af state : " + autoFocusState);
+              }
+
+              @Override
+              public void onError(Throwable e) {
+
+              }
+
+              @Override
+              public void onComplete() {
+
+              }
+            });
 
             seekBar.setEnabled(true);
 
